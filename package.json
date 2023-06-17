@@ -1,0 +1,17 @@
+{
+  "name": "bird-spy",
+  "version": "1.0.0",
+  "description": "Spying on daily updated job posts tailored for my needs",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.4.0",
+    "cheerio": "^1.0.0-rc.12",
+    "node-cron": "^3.0.2",
+    "puppeteer": "^20.7.2"
+  }
+}
