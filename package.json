@@ -4,7 +4,8 @@
   "description": "Spying on daily updated job posts tailored for my needs",
   "main": "main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "tsc && node dist/main.js",
+    "watch": "tsc watch"
   },
   "author": "",
   "license": "ISC",
@@ -13,5 +14,12 @@
     "cheerio": "^1.0.0-rc.12",
     "node-cron": "^3.0.2",
     "puppeteer": "^20.7.2"
+  },
+  "type": "module",
+  "devDependencies": {
+    "@types/axios": "^0.14.0",
+    "@types/cheerio": "^0.22.31",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.1.3"
   }
 }

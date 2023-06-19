@@ -1,22 +1,16 @@
 {
-  "timeRange": "byDay",
-  "maxEntriesPerQuery": 1000,
   "jobSites": {
     "linkedIn": {
-      "base": "https://www.linkedin.com/jobs/search/?",
-      "listOfKeywords": [
-        "keywords=react%20node&",
-        "keywords=frontend%20developer&",
-        "keywords=fullstack%20developer&",
-        "keywords=javascript&",
-        "keywords=software%20developer&",
-        "keywords=software%20engineer&"
-      ],
-      "timeRange": {
-        "byDay": "f_TPR=r86400&",
-        "byWeek": "f_TPR=r604800&"
+      "url": {
+        "base": "https://www.linkedin.com/jobs/search/?",
+        "timeRange": {
+          "byDay": "f_TPR=r86400",
+          "byWeek": "f_TPR=r604800"
+        },
+        "keywords": "keywords=",
+        "location": "location=",
+        "pagination": "start="
       },
-      "start": "start=",
       "maxEntriesPerPage": 25
     },
     "indeed": {},
@@ -25,6 +19,19 @@
     "otta": {},
     "wellFound": {}
   },
+
+  "location": "United States",
+  "timeRange": "byDay",
+  "maxEntriesPerQuery": 100,
+  "listOfSearchKeywords": [
+    "react node",
+    "frontend developer",
+    "fullstack developer",
+    "javascript",
+    "software developer",
+    "software engineer"
+  ],
+
   "titleShouldInclude": [
     "software",
     "application",
