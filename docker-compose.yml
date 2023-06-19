@@ -1,0 +1,41 @@
+version: '3.8'
+services:
+  bird-spy:
+    container_name: spy-node
+    image: node:20-alpine
+    build: .
+    command: npm start
+    volumes:
+      - .:/usr/src/bird-spy/jds
+    links:
+      - elasticsearch
+    depends_on:
+      - elasticsearch
+    environment:
+      - NODE_ENV=local
+      - NODE_PORT=
+      - ES_HOST=elasticsearch
+      - ELASTIC_URL=http://elasticsearch:9200
+    networks:
+      - spynet
+  elasticsearch:
+    container_name: spy-elastic
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.1.1
+    environment:
+      - cluster.name=elasticsearch-cluster
+      - bootstrap.memory_lock=true
+      - 'ES_JAVA_OPTS=-Xms512m -Xmx512m'
+      - discovery.type=single-node
+    volumes:
+      - esdata:/usr/share/elastic/data
+    logging:
+      driver: none
+    networks:
+      - spynet
+    ports:
+      - 9200:9200
+      - 9300:9300
+volumes:
+  esdata:
+networks:
+  spynet:

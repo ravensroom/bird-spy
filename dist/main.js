@@ -1,95 +1,66 @@
-import axios from 'axios';
-import cheerio from 'cheerio';
-import { default as config } from './config.json' assert { type: 'json' };
-const { jobSites, listOfSearchKeywords, maxEntriesPerQuery, location, priority, } = config;
-const timeRange = config.timeRange;
-const titleShouldExclude = new Set(config.titleShouldExclude);
-const titleShouldInclude = new Set(config.titleShouldInclude);
-const { linkedIn } = jobSites;
-async function getLinkedInPosts() {
-    const jobs = new Map();
-    for (let keywords of listOfSearchKeywords) {
-        let start = 0, totalEntries;
-        do {
-            const url = linkedIn.url.base +
-                linkedIn.url.timeRange[timeRange] +
-                '&' +
-                linkedIn.url.keywords +
-                keywords.split(' ').join('%20') +
-                '&' +
-                linkedIn.url.location +
-                location.split(' ').join('%20') +
-                '&' +
-                linkedIn.url.pagination +
-                start;
-            const $ = await getParsedHTML(url);
-            if (!totalEntries)
-                totalEntries = +$('.results-context-header__job-count')
-                    .text()
-                    .replace(/[\,\+]/g, '');
-            const jobCards = $('.jobs-search__results-list .base-card');
-            jobCards.each((index, jobCard) => {
-                const jobId = $(jobCard)?.attr('data-entity-urn')?.split(':').at(-1);
-                if (!jobId)
-                    return;
-                if (jobs.has(jobId))
-                    return;
-                const linkElement = $(jobCard).find('.base-card__full-link')[0];
-                const href = $(linkElement).attr('href');
-                const cardInfo = $(jobCard).find('.base-search-card__info').eq(0);
-                const title = $(cardInfo)
-                    .find('.base-search-card__title')
-                    .eq(0)
-                    .text()
-                    .trim();
-                const company = $(cardInfo)
-                    .find('.base-search-card__subtitle a')
-                    .eq(0)
-                    .text()
-                    .trim();
-                const location = $(cardInfo)
-                    .find('.job-search-card__location')
-                    .eq(0)
-                    .text()
-                    .trim();
-                const titleWords = title.split(/\s+|[,;|]/);
-                let isDesired = false;
-                for (let word of titleWords) {
-                    if (titleShouldExclude.has(word.toLowerCase()))
-                        return;
-                    if (titleShouldInclude.has(word.toLowerCase()))
-                        isDesired = true;
-                }
-                if (isDesired) {
-                    jobs.set(jobId, {
-                        id: jobId,
-                        title,
-                        company,
-                        href,
-                        location,
-                    });
-                }
-            });
-            start += linkedIn.maxEntriesPerPage;
-        } while (start <
-            (maxEntriesPerQuery
-                ? Math.min(maxEntriesPerQuery, totalEntries)
-                : totalEntries));
-    }
-    return jobs;
+import getQueryData from './utils/getQueryData.js';
+import { config as loadEnv } from 'dotenv';
+import { Client } from '@elastic/elasticsearch';
+import getParsedHTML from './utils/getParsedHTML.js';
+loadEnv({ path: new URL('../../.env.local', import.meta.url) });
+const elasticUrl = process.env.ELASTIC_URL || 'http://localhost:9200';
+const esclient = new Client({ node: elasticUrl });
+const { rules: { priority: priorityRules }, } = getQueryData();
+export async function addJob(jobId, job) {
+    await esclient.index({
+        index: 'job_list',
+        id: jobId,
+        body: job,
+    });
 }
-async function getParsedHTML(url) {
-    const response = await axios.get(url);
-    const html = response.data;
-    return cheerio.load(html);
+export async function hasJob(jobId) {
+    return await esclient.exists({
+        index: 'job_list',
+        id: jobId,
+    });
 }
-async function spy() {
-    try {
-        const linkedInJobs = await getLinkedInPosts();
-        console.log(linkedInJobs);
+async function setPriority() {
+    const res = await esclient.search({
+        index: 'job_list',
+        body: {
+            query: {
+                function_score: {
+                    query: {
+                        match_all: {}, // Retrieve all documents
+                    },
+                    // script_score: {
+                    //   script: calculatePriorityScript(),
+                    // },
+                },
+            },
+        },
+    });
+    const jobList = res.hits.hits.map((hit) => {
+        const job = hit._source;
+        job.priority = hit._score;
+        return job;
+    });
+    for (const job of jobList) {
+        await addJob(job.id, job);
     }
-    catch (error) {
-        console.error('Error:', error);
-    }
+    console.log(jobList);
 }
-spy();
+async function fetchJobContent(url) {
+    const dumbURL = 'https://www.linkedin.com/jobs/view/backend-software-engineer-tiktok-privacy-ai-at-tiktok-3521244560?refId=JOzHAJ6WpAgfeNRyouft%2Fw%3D%3D&trackingId=6XUQSgJBqKfgf87UvnhTLg%3D%3D&position=25&pageNum=0&trk=public_jobs_jserp-result_search-card';
+    const $ = await getParsedHTML(dumbURL);
+    const jd = $('.show-more-less-html__markup');
+    console.log($(jd).html());
+    return '';
+}
+await fetchJobContent('123');
+function calculatePriorityScript() {
+    const priorityScript = Object.entries(priorityRules)
+        .map(([keyword, value]) => `if (params._source.content.contains("${keyword}")) { return ${value}; }`)
+        .join(' ');
+    return `
+    ${priorityScript}
+    return 0;
+  `;
+}
+// const jobs = await getJobs();
+// console.log(jobs);
