@@ -6,8 +6,8 @@ export interface Job {
   company: string;
   href: string;
   location: string;
-  priority: number;
-  description: string;
+  priority?: number;
+  description?: string;
 }
 
 addJobs();
