@@ -24,6 +24,10 @@ async function addLinkedInJobs(
       const $ = await getParsedHTML(
         getFullQueryUrl(linkedIn, searchOptions, keywords, start)
       );
+      if ($ instanceof Error) {
+        console.log($);
+        return;
+      }
       totalEntries = +$('.results-context-header__job-count')
         .text()
         .replace(/[\,\+]/g, '');
@@ -48,7 +52,13 @@ async function addLinkedInJobs(
         if (!isDesired) return;
 
         const description = await getJobDescription(href);
+        if (description instanceof Error) {
+          console.log(description);
+          return;
+        }
+
         const priority = getPriorityPoints(description);
+
         const job = {
           id: jobId,
           title,
@@ -139,8 +149,11 @@ function jobIsDesired(
   return isDesired;
 }
 
-async function getJobDescription(url: string): Promise<string> {
+async function getJobDescription(url: string): Promise<string | Error> {
   const $ = await getParsedHTML(url);
+  if ($ instanceof Error) {
+    return $;
+  }
   const jd = $('.show-more-less-html__markup');
   return $(jd).html() || '';
 }

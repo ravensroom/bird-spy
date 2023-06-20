@@ -6,6 +6,6 @@ export default async function getParsedHTML(url) {
         return cheerio.load(response.data);
     }
     catch (e) {
-        throw new Error(e);
+        return new Error(e);
     }
 }

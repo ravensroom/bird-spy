@@ -7,6 +7,6 @@ export default async function getParsedHTML(url: string) {
     const response = await axios.get(url);
     return cheerio.load(response.data);
   } catch (e: any) {
-    throw new Error(e);
+    return new Error(e);
   }
 }
