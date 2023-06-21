@@ -2,36 +2,6 @@ import { useEffect, useState } from 'react';
 import JobItem from './JobItem.js';
 import { Job } from '@bird-spy/services/src/main.js';
 
-// const jobs = [
-//   {
-//     id: '1',
-//     title: 'Junior web developer',
-//     href: 'baidu.com',
-//     location: 'San Diego, CA',
-//     company: 'Google',
-//     description: '',
-//     priority: 200,
-//   },
-//   {
-//     id: '2',
-//     title: 'Junior web developer',
-//     href: 'baidu.com',
-//     location: 'San Diego, CA',
-//     company: 'Google',
-//     description: '',
-//     priority: 200,
-//   },
-//   {
-//     id: '3',
-//     title: 'Junior web developer',
-//     href: 'baidu.com',
-//     location: 'San Diego, CA',
-//     company: 'Google',
-//     description: '',
-//     priority: 200,
-//   },
-// ];
-
 const JobList = () => {
   const [jobs, setJobs] = useState<Job[]>([]);
 

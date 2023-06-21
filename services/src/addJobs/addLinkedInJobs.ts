@@ -3,14 +3,13 @@ import { Job, DB_PATH_BASE } from '../main.js';
 import { LinkedIn, SearchOptions, Rules } from './index.js';
 import getParsedHTML from '../utils/getParsedHTML.js';
 import getPriorityPoints from '../utils/getPriorityPoints.js';
+import { jobIsDesired } from '../utils/jobIsDesired.js';
 
 async function addLinkedInJobs(
   linkedIn: LinkedIn,
-  searchOptions: SearchOptions,
-  rules: Rules
+  searchOptions: SearchOptions
 ): Promise<void> {
   const { listOfSearchKeywords, maxEntriesPerQuery } = searchOptions;
-  const { titleShouldExclude, titleShouldInclude } = rules;
   const jobs = new Set<string>();
 
   // qeury each set of keywords
@@ -41,11 +40,7 @@ async function addLinkedInJobs(
         const { title, company, location } = getJobInfo($, jobCard);
         const href = `${linkedIn.url.jobPageBase}${jobId}`;
 
-        const isDesired = jobIsDesired(
-          title,
-          titleShouldExclude,
-          titleShouldInclude
-        );
+        const isDesired = jobIsDesired(title);
 
         if (!isDesired) return;
 
@@ -130,21 +125,6 @@ function getJobInfo($: cheerio.Root, jobCard: cheerio.Element) {
     .trim();
 
   return { title, company, location };
-}
-
-function jobIsDesired(
-  title: string,
-  titleShouldExclude: Set<string>,
-  titleShouldInclude: Set<string>
-): boolean {
-  const titleWords = title.split(/[\s(),.;\-|\/]+/);
-  let isDesired = false;
-  for (let word of titleWords) {
-    word = word.toLowerCase();
-    if (titleShouldExclude.has(word)) return false;
-    if (titleShouldInclude.has(word)) isDesired = true;
-  }
-  return isDesired;
 }
 
 async function getJobDescription(url: string): Promise<string | Error> {

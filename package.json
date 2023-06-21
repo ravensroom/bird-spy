@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "Spying on daily updated job posts tailored for my needs",
   "main": "main.js",
+  "scripts": {
+    "start": "npm i && npm start -w api & npm start -w ui"
+  },
   "author": "",
   "license": "ISC",
   "type": "module",

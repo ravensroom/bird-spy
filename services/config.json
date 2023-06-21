@@ -12,7 +12,7 @@
         "location": "location=",
         "pagination": "start="
       },
-      "maxEntriesPerPage": 0
+      "maxEntriesPerPage": 25
     },
     "indeed": {},
     "dice": {},
@@ -24,7 +24,7 @@
   "searchOptions": {
     "location": "United States",
     "timeRange": "byDay",
-    "maxEntriesPerQuery": 25,
+    "maxEntriesPerQuery": 0,
     "listOfSearchKeywords": [
       "react node",
       "frontend developer",

@@ -6,7 +6,6 @@ export default async function getAllJobs() {
   try {
     const files = await readdir(DB_PATH_BASE);
     for (const file of files) {
-      console.log(file);
       const filePath = DB_PATH_BASE + '/' + file;
       const data = await readFile(filePath, 'utf8');
       const job: Job = JSON.parse(data);

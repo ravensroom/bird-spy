@@ -56,7 +56,6 @@ const JobItem: React.FC<JobItemProps> = ({ job }) => {
         }`}
       >
         <div dangerouslySetInnerHTML={{ __html: description }}></div>
-        {description}
       </div>
     </div>
   );
