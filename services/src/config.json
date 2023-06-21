@@ -1,26 +1,4 @@
 {
-  "jobSites": {
-    "linkedIn": {
-      "url": {
-        "searchBase": "https://www.linkedin.com/jobs/search/?",
-        "jobPageBase": "https://www.linkedin.com/jobs/view/",
-        "timeRange": {
-          "byDay": "f_TPR=r86400",
-          "byWeek": "f_TPR=r604800"
-        },
-        "keywords": "keywords=",
-        "location": "location=",
-        "pagination": "start="
-      },
-      "maxEntriesPerPage": 25
-    },
-    "indeed": {},
-    "dice": {},
-    "upword": {},
-    "otta": {},
-    "wellFound": {}
-  },
-
   "searchOptions": {
     "location": "United States",
     "timeRange": "byDay",

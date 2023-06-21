@@ -1,14 +1,26 @@
 import { writeFile } from 'fs/promises';
 import { Job, DB_PATH_BASE } from '../main.js';
-import { LinkedIn, SearchOptions, Rules } from './index.js';
+import { SearchOptions } from './index.js';
 import getParsedHTML from '../utils/getParsedHTML.js';
 import getPriorityPoints from '../utils/getPriorityPoints.js';
 import { jobIsDesired } from '../utils/jobIsDesired.js';
 
-async function addLinkedInJobs(
-  linkedIn: LinkedIn,
-  searchOptions: SearchOptions
-): Promise<void> {
+const linkedIn = {
+  url: {
+    searchBase: 'https://www.linkedin.com/jobs/search/?',
+    jobPageBase: 'https://www.linkedin.com/jobs/view/',
+    timeRange: {
+      byDay: 'f_TPR=r86400',
+      byWeek: 'f_TPR=r604800',
+    },
+    keywords: 'keywords=',
+    location: 'location=',
+    pagination: 'start=',
+  },
+  maxEntriesPerPage: 25,
+};
+
+async function addLinkedInJobs(searchOptions: SearchOptions): Promise<void> {
   const { listOfSearchKeywords, maxEntriesPerQuery } = searchOptions;
   const jobs = new Set<string>();
 
@@ -19,7 +31,7 @@ async function addLinkedInJobs(
     // paginations
     do {
       const $ = await getParsedHTML(
-        getFullQueryUrl(linkedIn, searchOptions, keywords, start)
+        getFullQueryUrl(searchOptions, keywords, start)
       );
       if ($ instanceof Error) {
         console.log($);
@@ -82,7 +94,6 @@ async function addLinkedInJobs(
 }
 
 function getFullQueryUrl(
-  linkedIn: LinkedIn,
   searchOptions: SearchOptions,
   keywords: string,
   start: number
