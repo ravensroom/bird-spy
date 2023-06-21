@@ -7,7 +7,7 @@ const Header = () => {
     <div className="top-0 w-full flex justify-center">
       <div
         onClick={handleHeaderClick}
-        className="hover:cursor-pointer fixed bg-indigo-500 text-gray-100 text-base px-5 font-bold font-mono shadow-md shadow-slate-600"
+        className="hover:cursor-pointer fixed bg-indigo-500 text-gray-100 text-sm px-5 font-bold shadow-md shadow-slate-600"
       >
         Bird Spying...
       </div>

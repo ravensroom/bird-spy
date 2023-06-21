@@ -14,7 +14,7 @@ const JobItem: React.FC<JobItemProps> = ({ job }) => {
   };
 
   return (
-    <div className="flex flex-col border-t-[1px] border-indigo-200 shadow-inner ">
+    <div className="flex flex-col border-t-[1px] border-indigo-200 bg-opacity-30">
       <div className="flex justify-between items-center bg-indigo-300 rounded-md rounded-t-none">
         <div className="flex flex-col ">
           <div className="font-bold text-gray-800 ml-2">
@@ -57,7 +57,7 @@ const JobItem: React.FC<JobItemProps> = ({ job }) => {
         }`}
       >
         <div
-          className="text-sm"
+          className="text-xs"
           dangerouslySetInnerHTML={{ __html: description }}
         ></div>
       </div>

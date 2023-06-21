@@ -12,7 +12,7 @@ const JobList = () => {
   }, []);
 
   return (
-    <div className="flex flex-col justify-center align-items">
+    <div className="flex flex-col justify-center align-items mt-4 pb-4 sm:mx-8 md:mx-16 lg:mx-24">
       {jobs
         .sort((a, b) => (b.priority ?? 0) - (a.priority ?? 0))
         .map((job) => (
