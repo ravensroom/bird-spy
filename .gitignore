@@ -1,6 +1,4 @@
 node_modules
-html-test
-.vscode
-pg.js
 db
 dist
+.vscode

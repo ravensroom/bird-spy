@@ -1,5 +1,3 @@
-import addJobs from './addJobs/index.js';
-
 export interface Job {
   id: string;
   title: string;
@@ -9,5 +7,3 @@ export interface Job {
   priority?: number;
   description?: string;
 }
-
-addJobs();

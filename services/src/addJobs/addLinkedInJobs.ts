@@ -1,10 +1,8 @@
 import { writeFile } from 'fs/promises';
-import { Job } from '../main.js';
+import { Job, DB_PATH_BASE } from '../main.js';
 import { LinkedIn, SearchOptions, Rules } from './index.js';
 import getParsedHTML from '../utils/getParsedHTML.js';
 import getPriorityPoints from '../utils/getPriorityPoints.js';
-
-const DB_PATH_BASE = new URL('../../db', import.meta.url).pathname;
 
 async function addLinkedInJobs(
   linkedIn: LinkedIn,
@@ -13,7 +11,7 @@ async function addLinkedInJobs(
 ): Promise<void> {
   const { listOfSearchKeywords, maxEntriesPerQuery } = searchOptions;
   const { titleShouldExclude, titleShouldInclude } = rules;
-  const jobs = new Set();
+  const jobs = new Set<string>();
 
   // qeury each set of keywords
   for (let keywords of listOfSearchKeywords) {
@@ -59,7 +57,7 @@ async function addLinkedInJobs(
 
         const priority = getPriorityPoints(description);
 
-        const job = {
+        const job: Job = {
           id: jobId,
           title,
           company,

@@ -4,8 +4,7 @@
   "description": "Spying on daily updated job posts tailored for my needs",
   "main": "main.js",
   "scripts": {
-    "start": "tsc && node dist/main.js",
-    "watch": "tsc watch"
+    "start": "tsc && node -r tsconfig-paths/register dist/main.js"
   },
   "author": "",
   "license": "ISC",
@@ -19,7 +18,9 @@
   "devDependencies": {
     "@types/axios": "^0.14.0",
     "@types/cheerio": "^0.22.31",
+    "nodemon": "^2.0.22",
     "ts-node": "^10.9.1",
+    "tsconfig-paths": "^4.2.0",
     "typescript": "^5.1.3"
   }
 }
