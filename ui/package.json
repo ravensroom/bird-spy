@@ -1,5 +1,5 @@
 {
-  "name": "bird-spy-ui",
+  "name": "@bird-spy/ui",
   "version": "0.0.0",
   "type": "module",
   "scripts": {

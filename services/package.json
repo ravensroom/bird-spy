@@ -1,5 +1,5 @@
 {
-  "name": "bird-spy",
+  "name": "@bird-spy/services",
   "version": "1.0.0",
   "description": "Spying on daily updated job posts tailored for my needs",
   "main": "main.js",
