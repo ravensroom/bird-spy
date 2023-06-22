@@ -45,13 +45,13 @@ const Input: React.FC<InputProps> = ({
     <div className="flex flex-wrap h-auto p-1 gap-1 items-center text-sm m-[1px] rounded-sm shadow-inner shadow-black-100 border border-gray-400">
       <div className="flex sm:mr-0 w-full items-center sm:w-auto">
         <div className="flex-grow items-center relative w-full inline-flex">
-          <div className="mr-1 text-gray-600 w-7">
+          <div className="absolute left-[2px] mr-1 bg-pink-100 rounded-full text-gray-600 w-6">
             <label htmlFor={id}>
               {(tip && <IconTip content={tip}>{children}</IconTip>) || children}
             </label>
           </div>
           <input
-            className="h-7 w-full pr-[21px] pl-1  bg-opacity-60 bg-white text-sm outline-none"
+            className="h-7 w-full pr-[21px] pl-8 bg-opacity-60 bg-white text-sm outline-none"
             type="text"
             id={id}
             placeholder={placeHolder}

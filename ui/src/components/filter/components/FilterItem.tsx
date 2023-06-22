@@ -30,6 +30,15 @@ const Filter: React.FC = () => {
   const locations = useDataList([locationHolder]);
   const timeRange = useDataList([timeRangeHolder]);
 
+  const handleClearAll = () => {
+    keywords.clearAllItems();
+    titleIncludes.clearAllItems();
+    titleExcludes.clearAllItems();
+    priorities.clearAllItems();
+    locations.clearAllItems();
+    timeRange.clearAllItems();
+  };
+
   return (
     <div className="flex flex-col">
       <Input
@@ -93,7 +102,7 @@ const Filter: React.FC = () => {
         <CalendarDaysIcon />
       </Input>
       <div className="flex justify-end mt-1">
-        <ActionButton type="clear" onClick={() => {}}>
+        <ActionButton type="clear" onClick={handleClearAll}>
           Clear all
         </ActionButton>
         <ActionButton type="save" onClick={() => {}}>

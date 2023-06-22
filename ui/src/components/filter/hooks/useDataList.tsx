@@ -5,6 +5,7 @@ type UseDataList = {
   data: string[] | Priorities;
   addItem: (item: string) => void;
   deleteItem: (item: string) => void;
+  clearAllItems: () => void;
 };
 
 function useDataList(initialData: string[] | Priorities): UseDataList {
@@ -39,10 +40,16 @@ function useDataList(initialData: string[] | Priorities): UseDataList {
     }
   };
 
+  const clearAllItems = () => {
+    if (Array.isArray(data)) setData([]);
+    else setData({});
+  };
+
   return {
     data,
     addItem,
     deleteItem,
+    clearAllItems,
   };
 }
 
