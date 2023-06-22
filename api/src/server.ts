@@ -1,11 +1,11 @@
 import express from 'express';
-import dummyMiddleware from './middlewares/index.js';
+import { enableCORS } from './middlewares/index.js';
 import APIRoute from './routes/APIRoute.js';
 
 const app = express();
 
 // Apply middleware
-// app.use(dummyMiddleware);
+app.use(enableCORS);
 
 // Register routes
 app.use('/api', APIRoute);
