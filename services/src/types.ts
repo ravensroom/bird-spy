@@ -7,3 +7,16 @@ export interface Job {
   priority?: number;
   description?: string;
 }
+
+export interface Config {
+  searchOptions: {
+    location: string;
+    timeRange: 'by day' | 'by week';
+    listOfSearchKeywords: string[];
+  };
+  rules: {
+    titleShouldInclude: string[];
+    titleShouldExclude: string[];
+    priorityList: { [key: string]: number };
+  };
+}

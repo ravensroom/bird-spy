@@ -1,8 +1,7 @@
 {
   "searchOptions": {
     "location": "United States",
-    "timeRange": "byDay",
-    "maxEntriesPerQuery": 0,
+    "timeRange": "by day",
     "listOfSearchKeywords": [
       "react node",
       "frontend developer",
@@ -58,7 +57,7 @@
       "designer",
       "business"
     ],
-    "priority": {
+    "priorityList": {
       "junior": 200,
       "jr.": 200,
       "entry": 200,

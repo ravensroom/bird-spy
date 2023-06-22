@@ -6,6 +6,7 @@ const app = express();
 
 // Apply middleware
 app.use(enableCORS);
+app.use(express.json());
 
 // Register routes
 app.use('/api', APIRoute);

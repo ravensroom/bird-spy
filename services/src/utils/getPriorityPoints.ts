@@ -1,10 +1,10 @@
 import getQueryData from './getQueryData.js';
 
 const {
-  rules: { priority },
+  rules: { priorityList },
 } = getQueryData();
 
-const priorityRules: PriorityRules = priority;
+const priorityRules: PriorityRules = priorityList;
 
 interface PriorityRules {
   [key: string]: number;

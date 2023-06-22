@@ -39,6 +39,33 @@ const Filter: React.FC = () => {
     timeRange.clearAllItems();
   };
 
+  const handleSave = () => {
+    const data = {
+      keywords: keywords.data,
+      titleIncludes: titleIncludes.data,
+      titleExcludes: titleExcludes.data,
+      priorities: priorities.data,
+      locations: locations.data,
+      timeRange: timeRange.data,
+    };
+    fetch('http://localhost:3000/api/jobs/rules', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    })
+      .then((response) => response.json())
+      .then((result) => {
+        // Handle the API response
+        console.log(result);
+      })
+      .catch((error) => {
+        // Handle any errors
+        console.error(error);
+      });
+  };
+
   return (
     <div className="flex flex-col">
       <Input
@@ -105,7 +132,7 @@ const Filter: React.FC = () => {
         <ActionButton type="clear" onClick={handleClearAll}>
           Clear all
         </ActionButton>
-        <ActionButton type="save" onClick={() => {}}>
+        <ActionButton type="save" onClick={handleSave}>
           Save
         </ActionButton>
         <ActionButton type="submit" onClick={() => {}}>

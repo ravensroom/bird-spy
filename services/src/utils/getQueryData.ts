@@ -1,6 +1,6 @@
 import { default as config } from '../config.json' assert { type: 'json' };
 
-type TimeRange = 'byDay' | 'byWeek';
+type TimeRange = 'by day' | 'by week';
 
 const { searchOptions, rules } = config;
 
