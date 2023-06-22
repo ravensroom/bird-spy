@@ -14,14 +14,14 @@ const JobItem: React.FC<JobItemProps> = ({ job }) => {
   };
 
   return (
-    <div className="flex flex-col border-t-[1px] border-indigo-200 bg-opacity-30">
-      <div className="flex justify-between items-center bg-indigo-300 rounded-md rounded-t-none">
+    <div className="flex flex-col border-t-[1px] border-white">
+      <div className="flex justify-between items-center bg-indigo-100 bg-opacity-90 rounded-md rounded-t-none">
         <div className="flex flex-col ">
           <div className="font-bold text-gray-800 ml-2">
             <a
               href={href}
               target="_blank"
-              className="text-sm hover:bg-indigo-400 active:bg-indigo-500"
+              className="text-sm hover:bg-indigo-300 active:bg-indigo-500"
             >
               {title}
             </a>
@@ -52,7 +52,7 @@ const JobItem: React.FC<JobItemProps> = ({ job }) => {
         </div>
       </div>
       <div
-        className={`px-5 py-2 shadow-md shadow-blue-800 text-sm bg-indigo-200 mx-4 mb-2 sm:mx-6 text-slate-900 ${
+        className={`px-5 py-2 shadow-md shadow-blue-800 text-sm bg-indigo-100 bg-opacity-50 mx-4 mb-2 sm:mx-6 text-slate-900 ${
           isOpen ? 'block' : 'hidden'
         }`}
       >

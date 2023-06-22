@@ -12,13 +12,19 @@ const JobList = () => {
   }, []);
 
   return (
-    <div className="flex flex-col justify-center align-items mt-4 pb-4 sm:mx-8 md:mx-16 lg:mx-24">
-      {jobs
-        .sort((a, b) => (b.priority ?? 0) - (a.priority ?? 0))
-        .map((job) => (
-          <JobItem key={job.id} job={job} />
-        ))}
-    </div>
+    <>
+      <div className="flex flex-col justify-center align-items pb-4 sm:mx-8 md:mx-16 lg:mx-24">
+        <div className="px-2 py-1 bg-green-100 bg-opacity-30 text-gray-600 text-xs">
+          <span>Total results: </span>
+          {jobs.length}
+        </div>
+        {jobs
+          .sort((a, b) => (b.priority ?? 0) - (a.priority ?? 0))
+          .map((job) => (
+            <JobItem key={job.id} job={job} />
+          ))}
+      </div>
+    </>
   );
 };
 

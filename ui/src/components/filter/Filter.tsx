@@ -1,19 +1,23 @@
 import React, { useState, ChangeEvent } from 'react';
+import {
+  MagnifyingGlassCircleIcon,
+  MapPinIcon,
+  CalendarDaysIcon,
+  CheckCircleIcon,
+  XCircleIcon,
+  AdjustmentsVerticalIcon,
+} from '@heroicons/react/24/outline';
 import Input from './components/Input';
-import SelectedList from './components/SelectedList';
 
-interface Priority {
-  keyword: string;
-  value: number;
+interface Priorities {
+  [key: string]: number;
 }
 
 const Filter: React.FC = () => {
   const [keywords, setKeywords] = useState<string[]>([]);
   const [titleShouldInclude, setTitleShouldInclude] = useState<string[]>([]);
   const [titleShouldExclude, setTitleShouldExclude] = useState<string[]>([]);
-  const [priorities, setPriorities] = useState<Priority[]>([]);
-  const [timeRange, setTimeRange] = useState<string>('');
-  const [location, setLocation] = useState<string>('');
+  const [priorities, setPriorities] = useState<Priorities>({});
 
   const handleKeywordAdd = (value: string) => {
     setKeywords([...keywords, value]);
@@ -27,74 +31,51 @@ const Filter: React.FC = () => {
     setTitleShouldExclude([...titleShouldExclude, value]);
   };
 
-  const handlePriorityAdd = (keyword: string, value: number) => {
-    setPriorities([...priorities, { keyword, value }]);
-  };
-
-  const handleTimeRangeChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    setTimeRange(event.target.value);
-  };
-
-  const handleLocationChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setLocation(event.target.value);
+  const handlePriorityAdd = (value: string) => {
+    const [key, val] = value.split(' ');
+    setPriorities((prev) => ({
+      ...prev,
+      [key]: Number(val),
+    }));
   };
 
   return (
-    <div className="filter-container pb-4 sm:mx-8 md:mx-16 lg:mx-24 mt-10 bg-green-100 bg-opacity-60 rounded-md p-2 flex flex-col">
-      <Input id="keyword-input" label="Keywords" onAdd={handleKeywordAdd} />
-      <SelectedList items={keywords} />
-      <div className="flex items-center text-sm">
-        <label className="w-40 pr-2" htmlFor="time-range-select">
-          Time Range:
-        </label>
-        <select id="time-range-select" onChange={handleTimeRangeChange}>
-          <option value="">Select Time Range</option>
-          <option value="byDay">By Day</option>
-          <option value="byWeek">By Week</option>
-        </select>
-        {timeRange}
-      </div>
-      <div className="flex items-center text-sm">
-        <label className="w-40 pr-2" htmlFor="location-input">
-          Location:
-        </label>
-        <input
-          type="text"
-          id="location-input"
-          onChange={handleLocationChange}
-        />
-        {location}
-      </div>
+    <div className="filter-container pb-4 sm:mx-8 md:mx-16 lg:mx-24 rounded-md pt-8 flex flex-col">
+      <Input
+        id="keyword-input"
+        placeHolder="fullstack developer"
+        tip="Add search queries"
+        onAdd={handleKeywordAdd}
+      >
+        <MagnifyingGlassCircleIcon />
+      </Input>
       <Input
         id="title-include-input"
-        label="Title Includes"
+        placeHolder="junior"
+        tip="Add keywords that job titles should include"
         onAdd={handleTitleShouldIncludeAdd}
-      />
-      <SelectedList items={titleShouldInclude} />
+      >
+        <CheckCircleIcon />
+      </Input>
 
       <Input
         id="title-exclude-input"
-        label="Title Excludes"
+        placeHolder="senior"
+        tip="Add keywords that job titles should exclude"
         onAdd={handleTitleShouldExcludeAdd}
-      />
-      <SelectedList items={titleShouldExclude} />
+      >
+        <XCircleIcon />
+      </Input>
 
       <div>
         <Input
           id="priority-keyword-input"
-          label="Priority Keyword"
+          placeHolder="citizen: -100"
+          tip="Add priorities to words found in job descriptions ranging from -100~100"
           onAdd={handlePriorityAdd}
-        />
-        <Input
-          id="priority-value-input"
-          label="Priority Value"
-          onAdd={handlePriorityAdd}
-        />
-        <SelectedList
-          items={priorities.map(
-            (priority) => `${priority.keyword} (${priority.value})`
-          )}
-        />
+        >
+          <AdjustmentsVerticalIcon />
+        </Input>
       </div>
     </div>
   );
