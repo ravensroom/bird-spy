@@ -1,7 +1,7 @@
 import React, { useState, ChangeEvent, KeyboardEvent } from 'react';
 import InputItem from './InputItem';
 import IconTip from './IconTip';
-import { Priorities } from '../Filter';
+import { Priorities } from './FilterItem';
 
 interface InputProps {
   id: string;
@@ -51,7 +51,7 @@ const Input: React.FC<InputProps> = ({
             </label>
           </div>
           <input
-            className="h-7 w-full pr-[21px] pl-1 bg-opacity-60 bg-white text-sm outline-none"
+            className="h-7 w-full pr-[21px] pl-1  bg-opacity-60 bg-white text-sm outline-none"
             type="text"
             id={id}
             placeholder={placeHolder}

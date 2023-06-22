@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Priorities } from '../Filter';
+import { Priorities } from '../components/FilterItem';
 
 type UseDataList = {
   data: string[] | Priorities;
