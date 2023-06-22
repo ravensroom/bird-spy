@@ -1,0 +1,15 @@
+/* Select the scrollbar track */
+::-webkit-scrollbar-track {
+  /* Change the background color */
+  background-color: #f1f1f1;
+}
+
+/* Select the scrollbar thumb */
+::-webkit-scrollbar-thumb {
+  /* Change the background color */
+  background-color: red;
+
+  /* Change the size of the thumb */
+  height: 10px;
+  width: 10px;
+}

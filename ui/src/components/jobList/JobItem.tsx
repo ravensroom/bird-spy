@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Job } from '@bird-spy/services/src/main.js';
 
 interface JobItemProps {
@@ -8,17 +8,33 @@ interface JobItemProps {
 const JobItem: React.FC<JobItemProps> = ({ job }) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const { title, company, location, href, description, priority } = job;
+  const headerRef = useRef<HTMLDivElement>(null);
+  const [headerOffsetTop, setHeaderOffsetTop] = useState(0);
+  const [isViewd, setIsViewd] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (headerRef.current) {
+      setHeaderOffsetTop(headerRef.current.offsetTop);
+    }
+  }, []);
 
   const handleClickBird = () => {
+    window.scrollTo({
+      top: headerOffsetTop - 20,
+      behavior: 'instant',
+    });
+
     setIsOpen(!isOpen);
+    setIsViewd(true);
   };
 
   return (
     <div className="flex flex-col border-t-[1px] border-indigo-300">
       {/* Job jeader */}
       <div
+        ref={headerRef}
         className={`${
-          isOpen
+          isOpen || isViewd
             ? 'sticky top-5 bg-indigo-200 bg-opacity-100 shadow-inner border-b-2 border-b-indigo-300'
             : ''
         } flex justify-between items-center  rounded-md rounded-t-none`}

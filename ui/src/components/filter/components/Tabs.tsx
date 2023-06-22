@@ -23,7 +23,7 @@ const Tabs: React.FC<TabsProps> = ({ defaultIndex, onSelect, children }) => {
       return (
         <li
           className={`${
-            index === activeIndex ? 'bg-opacity-0 ' : ''
+            index === activeIndex ? 'bg-transparent' : ''
           } text-sm rounded-r-md py-1 px-2 cursor-pointer border-r-2 bg-pink-200 bg-opacity-50 border-r-slate-300 hover:bg-pink-100`}
           key={`nav-item-${index}`}
           onClick={() => {
@@ -45,7 +45,7 @@ const Tabs: React.FC<TabsProps> = ({ defaultIndex, onSelect, children }) => {
   return (
     <div className={``}>
       <ul className={`flex`}>{renderedNavLinks()}</ul>
-      <div className={`p-2 rounded-sm bg-opacity-2`}>{renderContent()}</div>
+      <div className={`p-2 rounded-sm`}>{renderContent()}</div>
     </div>
   );
 };
