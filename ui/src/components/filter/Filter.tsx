@@ -8,36 +8,17 @@ import {
   AdjustmentsVerticalIcon,
 } from '@heroicons/react/24/outline';
 import Input from './components/Input';
+import useDataList from './hooks/useDataList';
 
-interface Priorities {
+export interface Priorities {
   [key: string]: number;
 }
 
 const Filter: React.FC = () => {
-  const [keywords, setKeywords] = useState<string[]>([]);
-  const [titleShouldInclude, setTitleShouldInclude] = useState<string[]>([]);
-  const [titleShouldExclude, setTitleShouldExclude] = useState<string[]>([]);
-  const [priorities, setPriorities] = useState<Priorities>({});
-
-  const handleKeywordAdd = (value: string) => {
-    setKeywords([...keywords, value]);
-  };
-
-  const handleTitleShouldIncludeAdd = (value: string) => {
-    setTitleShouldInclude([...titleShouldInclude, value]);
-  };
-
-  const handleTitleShouldExcludeAdd = (value: string) => {
-    setTitleShouldExclude([...titleShouldExclude, value]);
-  };
-
-  const handlePriorityAdd = (value: string) => {
-    const [key, val] = value.split(' ');
-    setPriorities((prev) => ({
-      ...prev,
-      [key]: Number(val),
-    }));
-  };
+  const keywords = useDataList([]);
+  const titleIncludes = useDataList([]);
+  const titleExcludes = useDataList([]);
+  const priorities = useDataList({});
 
   return (
     <div className="filter-container pb-4 sm:mx-8 md:mx-16 lg:mx-24 rounded-md pt-8 flex flex-col">
@@ -45,15 +26,19 @@ const Filter: React.FC = () => {
         id="keyword-input"
         placeHolder="fullstack developer"
         tip="Add search queries"
-        onAdd={handleKeywordAdd}
+        data={keywords.data}
+        onAddItem={keywords.addItem}
+        onDeleteItem={keywords.deleteItem}
       >
         <MagnifyingGlassCircleIcon />
       </Input>
       <Input
         id="title-include-input"
         placeHolder="junior"
+        data={titleIncludes.data}
+        onAddItem={titleIncludes.addItem}
+        onDeleteItem={titleIncludes.deleteItem}
         tip="Add keywords that job titles should include"
-        onAdd={handleTitleShouldIncludeAdd}
       >
         <CheckCircleIcon />
       </Input>
@@ -61,8 +46,10 @@ const Filter: React.FC = () => {
       <Input
         id="title-exclude-input"
         placeHolder="senior"
+        data={titleExcludes.data}
+        onAddItem={titleExcludes.addItem}
+        onDeleteItem={titleExcludes.deleteItem}
         tip="Add keywords that job titles should exclude"
-        onAdd={handleTitleShouldExcludeAdd}
       >
         <XCircleIcon />
       </Input>
@@ -70,9 +57,11 @@ const Filter: React.FC = () => {
       <div>
         <Input
           id="priority-keyword-input"
-          placeHolder="citizen: -100"
+          placeHolder="citizen:-100"
+          data={priorities.data}
+          onAddItem={priorities.addItem}
+          onDeleteItem={priorities.deleteItem}
           tip="Add priorities to words found in job descriptions ranging from -100~100"
-          onAdd={handlePriorityAdd}
         >
           <AdjustmentsVerticalIcon />
         </Input>

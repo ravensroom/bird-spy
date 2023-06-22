@@ -7,7 +7,7 @@ interface JobItemProps {
 
 const JobItem: React.FC<JobItemProps> = ({ job }) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const { title, company, location, href, description } = job;
+  const { title, company, location, href, description, priority } = job;
 
   const handleClickBird = () => {
     setIsOpen(!isOpen);
@@ -17,14 +17,15 @@ const JobItem: React.FC<JobItemProps> = ({ job }) => {
     <div className="flex flex-col border-t-[1px] border-white">
       <div className="flex justify-between items-center bg-indigo-100 bg-opacity-90 rounded-md rounded-t-none">
         <div className="flex flex-col ">
-          <div className="font-bold text-gray-800 ml-2">
+          <div className=" ml-2">
             <a
               href={href}
               target="_blank"
-              className="text-sm hover:bg-indigo-300 active:bg-indigo-500"
+              className="text-sm text-gray-800 font-bold hover:bg-indigo-300 active:bg-indigo-500"
             >
               {title}
             </a>
+            <span className="text-xs text-gray-500">{` .${priority}`}</span>
           </div>
           <div className="text-[12px] mb-2 ml-2 ">
             <span className="text-gray-800">{company}</span>
