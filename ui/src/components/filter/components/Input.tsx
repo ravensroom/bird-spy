@@ -42,27 +42,30 @@ const Input: React.FC<InputProps> = ({
   };
 
   return (
-    <div className="flex flex-wrap h-auto gap-1 items-center text-sm m-[1px] rounded-sm shadow-inner shadow-black-100 border border-gray-400">
-      <label className="text-gray-600 w-6 py-1 pl-1" htmlFor={id}>
-        {(tip && <IconTip content={tip}>{children}</IconTip>) || children}
-      </label>
-
-      <div className="relative inline-block">
-        <input
-          className="h-5 p-2 pr-[21px] bg-opacity-60 w-50 bg-white text-xs outline-none"
-          type="text"
-          id={id}
-          placeholder={placeHolder}
-          value={value}
-          onChange={handleChange}
-          onKeyDown={handleKeyEnter}
-        />
-        <button
-          className="absolute top-1 right-1 flex items-center justify-center w-3 h-3 rounded-sm text-white font-extrabold hover:cursor-pointer active:bg-blue-600 bg-indigo-700 bg-opacity-70"
-          onClick={handleAdd}
-        >
-          +
-        </button>
+    <div className="flex flex-wrap h-auto p-1 gap-1 items-center text-sm m-[1px] rounded-sm shadow-inner shadow-black-100 border border-gray-400">
+      <div className="flex sm:mr-0 w-full items-center sm:w-auto">
+        <div className="flex-grow items-center relative w-full inline-flex">
+          <div className="mr-1 text-gray-600 w-7">
+            <label htmlFor={id}>
+              {(tip && <IconTip content={tip}>{children}</IconTip>) || children}
+            </label>
+          </div>
+          <input
+            className="h-7 w-full pr-[21px] pl-1 bg-opacity-60 bg-white text-sm outline-none"
+            type="text"
+            id={id}
+            placeholder={placeHolder}
+            value={value}
+            onChange={handleChange}
+            onKeyDown={handleKeyEnter}
+          />
+          <button
+            className="absolute right-[4px] flex items-center justify-center w-3 h-3 rounded-sm text-white font-extrabold hover:cursor-pointer active:bg-blue-600 bg-indigo-700 bg-opacity-70"
+            onClick={handleAdd}
+          >
+            +
+          </button>
+        </div>
       </div>
       {data &&
         (Array.isArray(data)
