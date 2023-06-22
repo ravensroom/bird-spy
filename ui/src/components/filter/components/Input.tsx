@@ -8,7 +8,7 @@ interface InputProps {
   children: React.ReactNode;
   placeHolder?: string;
   tip?: string;
-  data?: string[] | Priorities;
+  data: string[] | Priorities;
   onAddItem: (value: string) => void;
   onDeleteItem: (value: string) => void;
 }
@@ -67,6 +67,7 @@ const Input: React.FC<InputProps> = ({
           </button>
         </div>
       </div>
+
       {data &&
         (Array.isArray(data)
           ? data.map((content) => (

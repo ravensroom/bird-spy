@@ -19,6 +19,8 @@ const Filter: React.FC = () => {
   const titleIncludes = useDataList([]);
   const titleExcludes = useDataList([]);
   const priorities = useDataList({});
+  const locations = useDataList([]);
+  const timeRange = useDataList([]);
 
   return (
     <div className="filter-container pb-4 sm:mx-8 md:mx-16 lg:mx-24 rounded-md pt-8 flex flex-col">
@@ -64,6 +66,32 @@ const Filter: React.FC = () => {
           tip="Add priorities to words found in job descriptions ranging from -100~100"
         >
           <AdjustmentsVerticalIcon />
+        </Input>
+      </div>
+
+      <div>
+        <Input
+          id="priority-keyword-input"
+          placeHolder="united states"
+          data={locations.data}
+          onAddItem={locations.addItem}
+          onDeleteItem={locations.deleteItem}
+          tip="Add locations"
+        >
+          <MapPinIcon />
+        </Input>
+      </div>
+
+      <div>
+        <Input
+          id="priority-keyword-input"
+          placeHolder="by day"
+          data={timeRange.data}
+          onAddItem={timeRange.addItem}
+          onDeleteItem={timeRange.deleteItem}
+          tip="Select time range: by day/week/month"
+        >
+          <CalendarDaysIcon />
         </Input>
       </div>
     </div>

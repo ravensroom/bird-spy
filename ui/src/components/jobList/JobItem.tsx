@@ -15,7 +15,12 @@ const JobItem: React.FC<JobItemProps> = ({ job }) => {
 
   return (
     <div className="flex flex-col border-t-[1px] border-white">
-      <div className="flex justify-between items-center bg-indigo-100 bg-opacity-90 rounded-md rounded-t-none">
+      {/* Job jeader */}
+      <div
+        className={`${
+          isOpen ? 'sticky top-5' : ''
+        } flex justify-between items-center bg-indigo-100 bg-opacity-90 rounded-md rounded-t-none`}
+      >
         <div className="flex flex-col ">
           <div className=" ml-2">
             <a
@@ -52,6 +57,7 @@ const JobItem: React.FC<JobItemProps> = ({ job }) => {
           </div>
         </div>
       </div>
+      {/* Job descrption */}
       <div
         className={`px-5 py-2 shadow-md shadow-blue-800 text-sm bg-indigo-100 bg-opacity-50 mx-4 mb-2 sm:mx-6 text-slate-900 ${
           isOpen ? 'block' : 'hidden'
