@@ -4,6 +4,7 @@
   "description": "Spying on daily updated job posts tailored for my needs",
   "main": "main.js",
   "scripts": {
+    "build": "tsc",
     "start": "tsc && node ./dist/main.js"
   },
   "author": "",

@@ -1,4 +1,4 @@
-import { writeFile } from 'fs/promises';
+import { writeFile, access } from 'fs/promises';
 import { Job, DB_PATH_BASE, MAX_ENTRIES_PER_QUERY } from '../main.js';
 import { SearchOptions } from './index.js';
 import getParsedHTML from '../utils/getParsedHTML.js';
@@ -22,51 +22,66 @@ const linkedIn = {
 
 async function addLinkedInJobs(searchOptions: SearchOptions): Promise<void> {
   const { listOfSearchKeywords } = searchOptions;
-  const jobs = new Set<string>();
+  const jobs = new Map<string, number[]>();
+  let totalAdded = 0;
 
   // qeury each set of keywords
   for (let keywords of listOfSearchKeywords) {
-    console.log(keywords);
     let start = 0,
       totalEntries = 0;
     let count = 0;
+    let lastAddedAt = 0;
     // paginations
     do {
-      const $ = await getParsedHTML(
-        getFullQueryUrl(searchOptions, keywords, start)
-      );
+      const url = getFullQueryUrl(searchOptions, keywords, start);
+      const $ = await getParsedHTML(url);
       if ($ instanceof Error) {
         console.log(
           `${keywords}: Error fetching jobs from ${start}, next start`
         );
         continue;
       }
-      totalEntries = +$('.results-context-header__job-count')
-        .text()
-        .replace(/[\,\+]/g, '');
+      if (!totalEntries)
+        totalEntries = +$('.results-context-header__job-count')
+          .text()
+          .replace(/[\,\+]/g, '');
 
       const jobCards = $('.jobs-search__results-list .base-card');
       // process all jobs from start, total numbers: linkedIn.maxEntriesPerPage
-      jobCards.each(async (index, jobCard) => {
+      for (const jobCard of jobCards) {
         count++;
         const jobId = $(jobCard)?.attr('data-entity-urn')?.split(':').at(-1);
-        if (!jobId) return;
-        if (jobs.has(jobId)) return;
-        console.log(
-          `${keywords}: at ${count} job / ${totalEntries} of id ${jobId}`
-        );
-        jobs.add(jobId);
+        if (!jobId) continue;
 
         const { title, company, location } = getJobInfo($, jobCard);
-        const href = `${linkedIn.url.jobPageBase}${jobId}`;
+        console.log(
+          `${keywords}: at ${count} job / ${totalEntries} of title ${title}`
+        );
+        if (jobs.has(jobId)) {
+          console.log(
+            `Job (${title}) visited at [start, count]: ${jobs.get(jobId)}`,
+
+            `Last add at ${lastAddedAt}`
+          );
+          if (count - lastAddedAt > 500) {
+            console.log(`Long time no add...`);
+            return;
+          }
+          continue;
+        }
+        jobs.set(jobId, [start, count]);
 
         const isDesired = jobIsDesired(title);
-        if (!isDesired) return;
+        if (!isDesired) {
+          console.log(`Skip job of undesired title ${title}`);
+          continue;
+        }
 
+        const href = `${linkedIn.url.jobPageBase}${jobId}`;
         const description = await getJobDescription(href);
         if (description instanceof Error) {
-          console.log(`Error fetching description for job ${jobId}, next`);
-          return;
+          console.log(`Error fetching description for job ${jobId}, next job`);
+          continue;
         }
 
         const priority = getPriorityPoints(description);
@@ -88,18 +103,28 @@ async function addLinkedInJobs(searchOptions: SearchOptions): Promise<void> {
           .join('_')}.json`;
 
         try {
-          await writeFile(DB_PATH_BASE + '/' + fileName, JSON.stringify(job));
-          console.log(`Added ${fileName} to db`);
+          await access(DB_PATH_BASE + '/' + fileName);
+          console.log('File exists');
         } catch (e: any) {
-          throw new Error(e);
+          try {
+            await writeFile(DB_PATH_BASE + '/' + fileName, JSON.stringify(job));
+            console.log(`Added ${fileName} to db`);
+            lastAddedAt = count;
+            totalAdded += 1;
+          } catch (err) {
+            console.log(err);
+          }
         }
-      });
-
+      }
       start += linkedIn.maxEntriesPerPage;
-      console.log(getBoundary(MAX_ENTRIES_PER_QUERY, totalEntries));
+      console.log(
+        start,
+        'boundary:',
+        getBoundary(MAX_ENTRIES_PER_QUERY, totalEntries)
+      );
     } while (start < getBoundary(MAX_ENTRIES_PER_QUERY, totalEntries));
   }
-  console.log('query completed');
+  console.log('Query completed, added', totalAdded);
 }
 
 function getFullQueryUrl(
@@ -108,6 +133,7 @@ function getFullQueryUrl(
   start: number
 ) {
   const { timeRange, location } = searchOptions;
+  //@ts-nocheck
   const url =
     linkedIn.url.searchBase +
     linkedIn.url.timeRange[timeRange] +
