@@ -2,7 +2,7 @@ import getQueryData from './getQueryData.js';
 
 const {
   rules: { titleShouldExclude, titleShouldInclude },
-} = getQueryData();
+} = await getQueryData();
 
 export function jobIsDesired(title: string): boolean {
   const titleWords = title.split(/[\s(),.;\-|\/]+/);

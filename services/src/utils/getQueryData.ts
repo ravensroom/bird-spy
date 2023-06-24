@@ -1,19 +1,17 @@
-import { default as config } from '../config.json' assert { type: 'json' };
+import { readFile } from 'fs/promises';
+import { Config } from '../types.js';
+import { CONFIG_PATH_BASE } from '../env.js';
 
-type TimeRange = 'by day' | 'by week';
+export default async function getQueryData() {
+  const data = await readFile(CONFIG_PATH_BASE + '/config.json', 'utf-8');
+  const config: Config = JSON.parse(data);
 
-const { searchOptions, rules } = config;
+  const { searchOptions, rules } = config;
+  const titleShouldExclude = new Set(config.rules.titleShouldExclude);
+  const titleShouldInclude = new Set(config.rules.titleShouldInclude);
 
-const timeRange: TimeRange = config.searchOptions.timeRange as TimeRange;
-const titleShouldExclude = new Set(config.rules.titleShouldExclude);
-const titleShouldInclude = new Set(config.rules.titleShouldInclude);
-
-export default function getQueryData() {
   return {
-    searchOptions: {
-      ...searchOptions,
-      timeRange,
-    },
+    searchOptions,
     rules: {
       ...rules,
       titleShouldExclude,

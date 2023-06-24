@@ -1,6 +1,6 @@
 import { Config } from '../types.js';
 import { writeFile } from 'fs/promises';
-import { CONFIG_PATH_BASE } from '../main.js';
+import { CONFIG_PATH_BASE } from '../env.js';
 
 export default async function changeRules(data: any) {
   try {
@@ -16,8 +16,8 @@ export default async function changeRules(data: any) {
         priorityList: data.priorities,
       },
     };
-    await writeFile(CONFIG_PATH_BASE + 'config.json', JSON.stringify(config));
-    console.log('Writing to', CONFIG_PATH_BASE + 'config.json');
+    await writeFile(CONFIG_PATH_BASE + '/config.json', JSON.stringify(config));
+    console.log('Writing to', CONFIG_PATH_BASE + '/config.json');
     return config;
   } catch (e) {
     console.log('Error writing to config', e);

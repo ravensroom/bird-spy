@@ -1,7 +1,7 @@
 import getQueryData from '../utils/getQueryData.js';
 import addLinkedInJobs from './addLinkedInJobs.js';
 
-const { searchOptions } = getQueryData();
+const { searchOptions } = await getQueryData();
 
 const addJobs = async (): Promise<void> => {
   await addLinkedInJobs(searchOptions);

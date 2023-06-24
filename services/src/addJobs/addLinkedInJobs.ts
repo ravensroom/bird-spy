@@ -1,9 +1,10 @@
 import { writeFile, access } from 'fs/promises';
-import { Job, DB_PATH_BASE, MAX_ENTRIES_PER_QUERY } from '../main.js';
+import { Job } from '../types.js';
 import { SearchOptions } from './index.js';
 import getParsedHTML from '../utils/getParsedHTML.js';
 import getPriorityPoints from '../utils/getPriorityPoints.js';
 import { jobIsDesired } from '../utils/jobIsDesired.js';
+import { DB_PATH_BASE, MAX_ENTRIES_PER_QUERY } from '../env.js';
 
 const linkedIn = {
   url: {

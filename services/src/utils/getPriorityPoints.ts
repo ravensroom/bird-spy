@@ -2,7 +2,7 @@ import getQueryData from './getQueryData.js';
 
 const {
   rules: { priorityList },
-} = getQueryData();
+} = await getQueryData();
 
 const priorityRules: PriorityRules = priorityList;
 
