@@ -10,6 +10,7 @@ import {
 import Input from './Input';
 import useDataList from '../hooks/useDataList';
 import ActionButton from './ActionButton';
+import { useSaveMessageContext } from '../../../contexts/SaveMessageProvider';
 
 export interface Priorities {
   [key: string]: number;
@@ -29,6 +30,8 @@ const Filter: React.FC = () => {
   const priorities = useDataList(prioritiesHolder);
   const locations = useDataList([locationHolder]);
   const timeRange = useDataList([timeRangeHolder]);
+
+  const { setHeaderMessage } = useSaveMessageContext();
 
   const handleClearAll = () => {
     keywords.clearAllItems();
@@ -57,12 +60,11 @@ const Filter: React.FC = () => {
     })
       .then((response) => response.json())
       .then((result) => {
-        // Handle the API response
-        console.log(result);
+        setHeaderMessage('Successfully saved!');
+        setTimeout(() => setHeaderMessage(''), 3000);
       })
       .catch((error) => {
-        // Handle any errors
-        console.error(error);
+        setHeaderMessage('Failed to save!');
       });
   };
 

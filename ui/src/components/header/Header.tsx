@@ -1,4 +1,8 @@
+import { useContext } from 'react';
+import { useSaveMessageContext } from '../../contexts/SaveMessageProvider';
+
 const Header = () => {
+  const { headerMessage } = useSaveMessageContext();
   const handleHeaderClick = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -9,8 +13,13 @@ const Header = () => {
         onClick={handleHeaderClick}
         className="hover:cursor-pointer bg-indigo-600 bg-opacity-80 text-gray-100 text-sm px-5 font-bold shadow-md shadow-slate-600"
       >
-        Bird Spying...
+        <span>BirdSpy</span>
       </div>
+      {headerMessage && (
+        <div className="p-1 rounded-md bg-pink-400 bg-opacity-80 text-xs text-white font-bold">
+          {headerMessage}
+        </div>
+      )}
     </div>
   );
 };

@@ -13,7 +13,7 @@ const JobList = () => {
 
   return (
     <>
-      <div className="flex flex-col justify-center align-items sm:mx-8 md:mx-16 lg:mx-24 border-2 border-indigo-400 border-opacity-40 mt-2 rounded-sm">
+      <div className="flex flex-col justify-center align-items sm:mx-8 md:mx-16 lg:mx-24 border-2 border-indigo-400 border-opacity-60 mt-2 rounded-sm">
         <div className="px-2 py-1 text-gray-600 text-xs">
           <span>Total results: </span>
           {jobs.length}
