@@ -84,7 +84,7 @@ async function addLinkedInJobs(searchOptions: SearchOptions): Promise<void> {
           continue;
         }
 
-        const priority = getPriorityPoints(description);
+        const { priority, priorityHits } = getPriorityPoints(description);
 
         const job: Job = {
           id: jobId,
@@ -94,6 +94,7 @@ async function addLinkedInJobs(searchOptions: SearchOptions): Promise<void> {
           location,
           description,
           priority,
+          priorityHits,
         };
 
         const fileName = `linkedIn-${jobId}-${title

@@ -4,8 +4,9 @@ export interface Job {
   company: string;
   href: string;
   location: string;
-  priority?: number;
-  description?: string;
+  priority: number;
+  priorityHits: string[];
+  description: string;
 }
 
 export interface Config {

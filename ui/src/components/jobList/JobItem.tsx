@@ -13,9 +13,22 @@ const JobItem: React.FC<JobItemProps> = ({ job }) => {
   const [isViewd, setIsViewd] = useState<boolean>(false);
 
   useEffect(() => {
-    if (headerRef.current) {
-      setHeaderOffsetTop(headerRef.current.offsetTop);
-    }
+    const updateHeaderOffsetTop = () => {
+      if (headerRef.current) {
+        setHeaderOffsetTop(headerRef.current.offsetTop);
+      }
+    };
+
+    // Update the offsetTop initially
+    updateHeaderOffsetTop();
+
+    // Add event listener for window resize
+    window.addEventListener('resize', updateHeaderOffsetTop);
+
+    // Clean up the event listener on component unmount
+    return () => {
+      window.removeEventListener('resize', updateHeaderOffsetTop);
+    };
   }, []);
 
   const handleClickBird = () => {
@@ -30,25 +43,36 @@ const JobItem: React.FC<JobItemProps> = ({ job }) => {
 
   return (
     <div className="flex flex-col border-t-[1px] border-indigo-300">
-      {/* Job jeader */}
+      {/* Job header */}
       <div
         ref={headerRef}
         className={`${
           isOpen || isViewd
-            ? 'sticky top-5 bg-indigo-200 bg-opacity-100 shadow-inner border-b-2 border-b-indigo-300'
+            ? 'sticky top-5 bg-indigo-200 bg-opacity-100 shadow-inner border-b-1 border-b-indigo-300'
             : ''
         } flex justify-between items-center  rounded-md rounded-t-none`}
       >
-        <div className="flex flex-col ">
-          <div className=" ml-2">
+        <div className="flex flex-col">
+          <div className="leading-[14px] ml-2 mt-1">
             <a
               href={href}
               target="_blank"
-              className="text-sm text-gray-800 font-bold hover:bg-indigo-200 active:bg-indigo-300"
+              className={`text-sm text-gray-800 font-bold  ${
+                isOpen || isViewd
+                  ? 'hover:bg-indigo-300'
+                  : 'hover:bg-indigo-200'
+              } active:bg-indigo-300`}
             >
               {title}
             </a>
-            <span className="text-xs text-gray-500">{` .${priority}`}</span>
+            <div className="flex flex-wrap leading-[7px] my-2 gap-2 text-xs text-gray-500">
+              <span>{` .${priority} | `}</span>
+              {job.priorityHits.map((item, index) => (
+                <span>{`${item}${
+                  index === job.priorityHits.length - 1 ? '' : ','
+                }`}</span>
+              ))}
+            </div>
           </div>
           <div className="text-[12px] mb-2 ml-2 ">
             <span className="text-gray-800">{company}</span>

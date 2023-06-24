@@ -2,7 +2,7 @@
   "searchOptions": {
     "location": "united states",
     "timeRange": "by day",
-    "listOfSearchKeywords": ["intern developer"]
+    "listOfSearchKeywords": ["react node"]
   },
   "rules": {
     "titleShouldInclude": [
