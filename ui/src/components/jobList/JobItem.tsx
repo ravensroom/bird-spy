@@ -65,16 +65,18 @@ const JobItem: React.FC<JobItemProps> = ({ job }) => {
             >
               {title}
             </a>
-            <div className="flex flex-wrap leading-[7px] my-2 gap-2 text-xs text-gray-500">
-              <span>{` .${priority} | `}</span>
-              {job.priorityHits.map((item, index) => (
-                <span>{`${item}${
-                  index === job.priorityHits.length - 1 ? '' : ','
-                }`}</span>
-              ))}
-            </div>
+            {job.priorityHits.length > 0 && (
+              <div className="flex flex-wrap leading-[7px] my-2 gap-2 text-xs text-gray-500">
+                <span>{` .${priority} | `}</span>
+                {job.priorityHits.map((item, index) => (
+                  <span>{`${item}${
+                    index === job.priorityHits.length - 1 ? '' : ','
+                  }`}</span>
+                ))}
+              </div>
+            )}
           </div>
-          <div className="text-[12px] mb-2 ml-2 ">
+          <div className="text-[12px] mb-1 ml-2 ">
             <span className="text-gray-800">{company}</span>
             <span className="pl-2 text-gray-600">{location}</span>
           </div>

@@ -1,4 +1,4 @@
-import React, { useState, ChangeEvent } from 'react';
+import React, { useState, ChangeEvent, useEffect } from 'react';
 import {
   MagnifyingGlassCircleIcon,
   MapPinIcon,
@@ -11,12 +11,13 @@ import Input from './Input';
 import useDataList from '../hooks/useDataList';
 import ActionButton from './ActionButton';
 import { useSaveMessageContext } from '../../../contexts/SaveMessageProvider';
+import { useSearchResultsContext } from '../../../contexts/SearchResultsProvider';
 
 export interface Priorities {
   [key: string]: number;
 }
 
-const keywordsHolder = 'fullstack developer';
+const keywordsHolder = 'software developer';
 const titleIncludesHolder = 'junior';
 const titleExcludesHolder = 'senior';
 const prioritiesHolder = { citizen: -100 };
@@ -32,6 +33,25 @@ const Filter: React.FC = () => {
   const timeRange = useDataList([timeRangeHolder]);
 
   const { setHeaderMessage } = useSaveMessageContext();
+  const { setResults } = useSearchResultsContext(); // will be used in another component
+
+  const handleSearch = () => {
+    handleSave();
+    const fetchJobsData = () => {
+      fetch('http://localhost:3000/api/jobs')
+        .then((response) => response.json())
+        .then((data) => {
+          setResults(data);
+        })
+        .catch((error) => {
+          console.error(error);
+          // Handle errors appropriately
+        });
+    };
+
+    // Start fetching updates
+    fetchJobsData();
+  };
 
   const handleClearAll = () => {
     keywords.clearAllItems();
@@ -137,7 +157,7 @@ const Filter: React.FC = () => {
         <ActionButton type="save" onClick={handleSave}>
           Save
         </ActionButton>
-        <ActionButton type="submit" onClick={() => {}}>
+        <ActionButton type="submit" onClick={handleSearch}>
           Search
         </ActionButton>
       </div>

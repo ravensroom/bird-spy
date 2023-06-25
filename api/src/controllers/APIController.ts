@@ -1,9 +1,12 @@
 import { Request, Response } from 'express';
 //@ts-ignore
 import { getAllJobs, changeRules } from '@bird-spy/services/dist/main.js';
+//@ts-ignore
+import { addJobs } from '@bird-spy/services/dist/main.js';
 
-export const getJobsAPI = async (req: Request, res: Response) => {
+export const getJobs = async (req: Request, res: Response) => {
   try {
+    addJobs();
     const jobsData = await getAllJobs();
     res.json(jobsData);
   } catch (error) {

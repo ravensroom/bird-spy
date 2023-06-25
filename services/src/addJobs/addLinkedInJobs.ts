@@ -65,7 +65,7 @@ async function addLinkedInJobs(searchOptions: SearchOptions): Promise<void> {
             `Last add at ${lastAddedAt}`
           );
           if (count - lastAddedAt > 500) {
-            console.log(`Long time no add...`);
+            console.log(`Long time no add..., break. Added`, totalAdded);
             return;
           }
           continue;

@@ -1,8 +1,6 @@
 import { readFile, readdir } from 'fs/promises';
 import { Job } from '../types.js';
-import dotenv from 'dotenv';
-dotenv.config({ path: '../.env.local' });
-const DB_PATH_BASE = process.env.DB_PATH_BASE || '.';
+import { DB_PATH_BASE } from '../env.js';
 
 export default async function getAllJobs() {
   const jobs: Job[] = [];

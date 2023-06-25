@@ -17,6 +17,7 @@ export default async function changeRules(data: any) {
       },
     };
     await writeFile(CONFIG_PATH_BASE + '/config.json', JSON.stringify(config));
+    console.log(config);
     console.log('Writing to', CONFIG_PATH_BASE + '/config.json');
     return config;
   } catch (e) {

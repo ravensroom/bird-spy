@@ -4,7 +4,8 @@
   "description": "Spying on daily updated job posts tailored for my needs",
   "main": "main.js",
   "scripts": {
-    "start": "npm i && npm start -w api & npm start -w ui"
+    "build": "npm run build -w services && npm run build -w api && npm i ",
+    "start": "npm run build && (npm start -w api & npm start -w ui)"
   },
   "author": "",
   "license": "ISC",
