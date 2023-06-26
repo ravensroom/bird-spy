@@ -14,7 +14,7 @@ import { useSearchResultsContext } from '../../../contexts/SearchResultsProvider
 import { useUserIdContext } from '../../../contexts/UserIdProvider';
 import useForm from '../hooks/useAllData';
 import api from '../../../apis/api';
-import { v4 as uuidv4 } from 'uuid';
+import { Config } from '../../../types/types';
 
 const listOfSearchKeywordsHolder = 'software developer';
 const titleIncludesHolder = 'junior';
@@ -23,28 +23,30 @@ const priorityListHolder = { citizen: -100 };
 const locationHolder = 'united states';
 const timeRangeHolder = 'by day';
 
-interface ConfigEditorProps {
-  id?: string;
-  name?: string;
+export interface ConfigEditorProps {
+  id: string;
+  config: Config;
 }
 
-const ConfigEditor: React.FC<ConfigEditorProps> = ({ id, name }) => {
-  const listOfSearchKeywords = useDataList([listOfSearchKeywordsHolder]);
-  const titleIncludes = useDataList([titleIncludesHolder]);
-  const titleExcludes = useDataList([titleExcludesHolder]);
-  const priorityList = useDataList(priorityListHolder);
-  const locations = useDataList([locationHolder]);
-  const timeRange = useDataList([timeRangeHolder]);
+const ConfigEditor: React.FC<ConfigEditorProps> = ({ id, config }) => {
+  const listOfSearchKeywords = useDataList('listOfSearchKeywords', [
+    listOfSearchKeywordsHolder,
+  ]);
+  const titleIncludes = useDataList('titleIncludes', config.body.titleIncludes);
+  const titleExcludes = useDataList('titleExcludes', config.body.titleExcludes);
+  const priorityList = useDataList('priorityList', config.body.priorityList);
+  const location = useDataList('location', [config.body.location]);
+  const timeRange = useDataList('timeRange', [config.body.timeRange]);
   const form = useForm([
     listOfSearchKeywords,
     titleIncludes,
     titleExcludes,
     priorityList,
-    locations,
+    location,
     timeRange,
   ]);
   const { setHeaderMessage } = useSaveMessageContext();
-  const { setResults } = useSearchResultsContext(); // will be used in another component
+  const { setResults } = useSearchResultsContext();
   const { userId } = useUserIdContext();
 
   const handleSearch = () => {};
@@ -54,15 +56,15 @@ const ConfigEditor: React.FC<ConfigEditorProps> = ({ id, name }) => {
   };
 
   const handleSave = () => {
-    const configBody = form.getAllItems();
-    const config = {
-      id: id || uuidv4(),
-      name: name || 'Search 1',
+    const configBody = form.getConfigBody();
+    const configData = {
+      id,
+      name: config?.name || 'New Search',
       userId,
       body: configBody,
     };
     api.configs
-      .saveConfig(config)
+      .saveConfig(configData)
       .then(() => {
         setHeaderMessage('Successfully saved!');
         setTimeout(() => setHeaderMessage(''), 3000);
@@ -117,9 +119,9 @@ const ConfigEditor: React.FC<ConfigEditorProps> = ({ id, name }) => {
       <Input
         id="priority-keyword-input"
         placeHolder={locationHolder}
-        data={locations.data}
-        onAddItem={locations.addItem}
-        onDeleteItem={locations.deleteItem}
+        data={location.data}
+        onAddItem={location.addItem}
+        onDeleteItem={location.deleteItem}
         tip="Add locations"
       >
         <MapPinIcon />

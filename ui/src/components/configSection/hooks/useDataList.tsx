@@ -1,14 +1,18 @@
 import { useState } from 'react';
-import { PriorityList } from '@type/types';
+import { PriorityList } from '../../../types/types';
 
 export type UseDataList = {
+  name: string;
   data: string[] | PriorityList;
   addItem: (item: string) => void;
   deleteItem: (item: string) => void;
   clearAllItems: () => void;
 };
 
-function useDataList(initialData: string[] | PriorityList): UseDataList {
+function useDataList(
+  name: string,
+  initialData: string[] | PriorityList
+): UseDataList {
   const [data, setData] = useState<string[] | PriorityList>(initialData);
 
   const addItem = (item: string) => {
@@ -46,6 +50,7 @@ function useDataList(initialData: string[] | PriorityList): UseDataList {
   };
 
   return {
+    name,
     data,
     addItem,
     deleteItem,

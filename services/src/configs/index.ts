@@ -25,12 +25,11 @@ const getConfigs = async (userId: string): Promise<Config[]> => {
     const exists = await userExists(userId);
     const configsDirName = `${DB_PATH_BASE}/${
       exists ? 'users' : 'anonymous'
-    }/configs`;
+    }/${userId}/configs`;
 
-    // Read the list of config file names in the directory
+    await mkdir(configsDirName, { recursive: true });
     const fileNames = await readdir(configsDirName);
 
-    // Read and parse the content of each config file
     const configs = await Promise.all(
       fileNames.map(async (fileName) => {
         const filePath = `${configsDirName}/${fileName}`;

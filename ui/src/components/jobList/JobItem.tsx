@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Job } from '@bird-spy/services/src/main.js';
+import { Job } from '../../types/types';
 
 interface JobItemProps {
   job: Job;
@@ -7,7 +7,15 @@ interface JobItemProps {
 
 const JobItem: React.FC<JobItemProps> = ({ job }) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const { title, company, location, href, description, priority } = job;
+  const {
+    title,
+    company,
+    location,
+    href,
+    description,
+    priorityPoints,
+    priorityHits,
+  } = job.body;
   const headerRef = useRef<HTMLDivElement>(null);
   const [headerOffsetTop, setHeaderOffsetTop] = useState(0);
   const [isViewd, setIsViewd] = useState<boolean>(false);
@@ -65,12 +73,12 @@ const JobItem: React.FC<JobItemProps> = ({ job }) => {
             >
               {title}
             </a>
-            {job.priorityHits.length > 0 && (
+            {priorityHits.length > 0 && (
               <div className="flex flex-wrap leading-[7px] my-2 gap-2 text-xs text-gray-500">
-                <span>{` .${priority} | `}</span>
-                {job.priorityHits.map((item, index) => (
+                <span>{` .${priorityPoints} | `}</span>
+                {priorityHits.map((item, index) => (
                   <span>{`${item}${
-                    index === job.priorityHits.length - 1 ? '' : ','
+                    index === priorityHits.length - 1 ? '' : ','
                   }`}</span>
                 ))}
               </div>

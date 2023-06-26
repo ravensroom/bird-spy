@@ -1,18 +1,18 @@
 import { useEffect, useState } from 'react';
 import JobItem from './JobItem.js';
-import { Job } from '@bird-spy/services/src/main.js';
+import { Job } from '../../types/types.js';
 import { useSearchResultsContext } from '../../contexts/SearchResultsProvider.js';
 
 const JobList = () => {
   const { results } = useSearchResultsContext();
-  const [jobs, setJobs] = useState<Job[]>([]);
+  // const [jobs, setJobs] = useState<Job[]>([]);
 
-  useEffect(() => {
-    fetch('http://localhost:3000/api/jobs')
-      .then((res) => res.json())
-      .then((data) => setJobs(data));
-  }, []);
-  //const jobs: Job[] = [];
+  // useEffect(() => {
+  //   fetch('http://localhost:3000/api/jobs')
+  //     .then((res) => res.json())
+  //     .then((data) => setJobs(data));
+  // }, []);
+  const jobs: Job[] = [];
 
   const filteredJobs = results.length > 0 ? results : jobs;
 
@@ -24,7 +24,7 @@ const JobList = () => {
           {filteredJobs.length}
         </div>
         {filteredJobs
-          .sort((a, b) => b.priority - a.priority)
+          .sort((a, b) => b.body.priorityPoints - a.body.priorityPoints)
           .map((job) => (
             <JobItem key={job.id} job={job} />
           ))}

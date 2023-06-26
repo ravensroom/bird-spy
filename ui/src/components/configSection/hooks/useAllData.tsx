@@ -1,5 +1,4 @@
-import { ConfigBody } from '@type/types';
-import { PriorityList } from '@type/types';
+import { ConfigBody } from '../../../types/types';
 import { UseDataList } from './useDataList';
 
 export default function useForm(dataListArray: UseDataList[]) {
@@ -8,7 +7,7 @@ export default function useForm(dataListArray: UseDataList[]) {
       dataList.clearAllItems();
     }
   };
-  const getAllItems = (): ConfigBody => {
+  const getConfigBody = (): ConfigBody => {
     const data: ConfigBody = {
       location: '',
       timeRange: 'by day',
@@ -18,20 +17,13 @@ export default function useForm(dataListArray: UseDataList[]) {
       priorityList: {},
     };
     for (let dataList of dataListArray) {
-      const keyName = getVariableName(dataList);
-      data[keyName] = dataList.data;
+      data[dataList.name] = dataList.data;
     }
     return data as ConfigBody;
   };
 
   return {
     clearAllItems,
-    getAllItems,
+    getConfigBody,
   };
-}
-
-function getVariableName(value: any) {
-  const variableObj = { value };
-  const variableName = Object.keys(variableObj)[0];
-  return variableName;
 }

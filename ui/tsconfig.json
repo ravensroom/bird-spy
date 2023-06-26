@@ -6,11 +6,6 @@
     "module": "ESNext",
     "skipLibCheck": true,
 
-    "baseUrl": ".", // Set the base directory for module resolution
-    "paths": {
-      "@type/*": ["../types/*"] // Define custom path mappings
-    },
-
     /* Bundler mode */
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,

@@ -1,6 +1,6 @@
-import { Config } from '@type/types';
+import { Config, Job } from '../types/types';
 
-const saveConfig = (config: Config): Promise<Response> => {
+const saveConfig = (config: Config): Promise<void> => {
   return fetch('http://localhost:3000/api/configs', {
     method: 'POST',
     headers: {
@@ -10,12 +10,12 @@ const saveConfig = (config: Config): Promise<Response> => {
   }).then((response) => response.json());
 };
 
-const getConfigs = (userId: string): Promise<Response> => {
+const getConfigs = (userId: string): Promise<Config[]> => {
   const url = `http://localhost:3000/api/configs?userId=${userId}`;
   return fetch(url, {}).then((response) => response.json());
 };
 
-const addJobs = (userId: string, config: Config): Promise<Response> => {
+const addJobs = (userId: string, config: Config): Promise<void> => {
   return fetch('http://localhost:3000/api/jobs', {
     method: 'POST',
     headers: {
@@ -25,7 +25,7 @@ const addJobs = (userId: string, config: Config): Promise<Response> => {
   }).then((response) => response.json());
 };
 
-const getJobs = (userId: string): Promise<Response> => {
+const getJobs = (userId: string): Promise<Job[]> => {
   const url = `http://localhost:3000/api/jobs?userId=${userId}`;
   return fetch(url, {}).then((response) => response.json());
 };
