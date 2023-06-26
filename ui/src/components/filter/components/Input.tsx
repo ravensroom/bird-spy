@@ -1,7 +1,7 @@
 import React, { useState, ChangeEvent, KeyboardEvent } from 'react';
 import InputItem from './InputItem';
 import IconTip from './IconTip';
-import { Priorities } from './FilterItem';
+import { Priorities } from './ConfigEditor';
 
 interface InputProps {
   id: string;

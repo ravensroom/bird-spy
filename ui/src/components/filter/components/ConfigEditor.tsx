@@ -1,4 +1,3 @@
-import React, { useState, ChangeEvent, useEffect } from 'react';
 import {
   MagnifyingGlassCircleIcon,
   MapPinIcon,
@@ -12,78 +11,63 @@ import useDataList from '../hooks/useDataList';
 import ActionButton from './ActionButton';
 import { useSaveMessageContext } from '../../../contexts/SaveMessageProvider';
 import { useSearchResultsContext } from '../../../contexts/SearchResultsProvider';
+import { useUserIdContext } from '../../../contexts/UserIdProvider';
+import useForm from '../hooks/useAllData';
+import api from '../../../apis/api';
+import { v4 as uuidv4 } from 'uuid';
 
-export interface Priorities {
-  [key: string]: number;
-}
-
-const keywordsHolder = 'software developer';
+const listOfSearchKeywordsHolder = 'software developer';
 const titleIncludesHolder = 'junior';
 const titleExcludesHolder = 'senior';
-const prioritiesHolder = { citizen: -100 };
+const priorityListHolder = { citizen: -100 };
 const locationHolder = 'united states';
 const timeRangeHolder = 'by day';
 
-const Filter: React.FC = () => {
-  const keywords = useDataList([keywordsHolder]);
+interface ConfigEditorProps {
+  id?: string;
+  name?: string;
+}
+
+const ConfigEditor: React.FC<ConfigEditorProps> = ({ id, name }) => {
+  const listOfSearchKeywords = useDataList([listOfSearchKeywordsHolder]);
   const titleIncludes = useDataList([titleIncludesHolder]);
   const titleExcludes = useDataList([titleExcludesHolder]);
-  const priorities = useDataList(prioritiesHolder);
+  const priorityList = useDataList(priorityListHolder);
   const locations = useDataList([locationHolder]);
   const timeRange = useDataList([timeRangeHolder]);
-
+  const form = useForm([
+    listOfSearchKeywords,
+    titleIncludes,
+    titleExcludes,
+    priorityList,
+    locations,
+    timeRange,
+  ]);
   const { setHeaderMessage } = useSaveMessageContext();
   const { setResults } = useSearchResultsContext(); // will be used in another component
+  const { userId } = useUserIdContext();
 
-  const handleSearch = () => {
-    handleSave();
-    const fetchJobsData = () => {
-      fetch('http://localhost:3000/api/jobs')
-        .then((response) => response.json())
-        .then((data) => {
-          setResults(data);
-        })
-        .catch((error) => {
-          console.error(error);
-          // Handle errors appropriately
-        });
-    };
-
-    // Start fetching updates
-    fetchJobsData();
-  };
+  const handleSearch = () => {};
 
   const handleClearAll = () => {
-    keywords.clearAllItems();
-    titleIncludes.clearAllItems();
-    titleExcludes.clearAllItems();
-    priorities.clearAllItems();
-    locations.clearAllItems();
-    timeRange.clearAllItems();
+    form.clearAllItems();
   };
 
   const handleSave = () => {
-    const data = {
-      keywords: keywords.data,
-      titleIncludes: titleIncludes.data,
-      titleExcludes: titleExcludes.data,
-      priorities: priorities.data,
-      locations: locations.data,
-      timeRange: timeRange.data,
+    const configBody = form.getAllItems();
+    const config = {
+      id: id || uuidv4(),
+      name: name || 'Search 1',
+      userId,
+      body: configBody,
     };
-    fetch('http://localhost:3000/api/jobs/rules', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    })
-      .then((response) => response.json())
-      .then((result) => {
+    api.configs
+      .saveConfig(config)
+      .then(() => {
         setHeaderMessage('Successfully saved!');
         setTimeout(() => setHeaderMessage(''), 3000);
       })
-      .catch((error) => {
+      .catch(() => {
         setHeaderMessage('Failed to save!');
       });
   };
@@ -92,11 +76,11 @@ const Filter: React.FC = () => {
     <div className="flex flex-col">
       <Input
         id="keyword-input"
-        placeHolder={keywordsHolder}
+        placeHolder={listOfSearchKeywordsHolder}
         tip="Add search queries"
-        data={keywords.data}
-        onAddItem={keywords.addItem}
-        onDeleteItem={keywords.deleteItem}
+        data={listOfSearchKeywords.data}
+        onAddItem={listOfSearchKeywords.addItem}
+        onDeleteItem={listOfSearchKeywords.deleteItem}
       >
         <MagnifyingGlassCircleIcon />
       </Input>
@@ -122,11 +106,11 @@ const Filter: React.FC = () => {
       </Input>
       <Input
         id="priority-keyword-input"
-        placeHolder={Object.entries(prioritiesHolder)[0].join(':')}
-        data={priorities.data}
-        onAddItem={priorities.addItem}
-        onDeleteItem={priorities.deleteItem}
-        tip="Add priorities to words found in job descriptions ranging from -100~100"
+        placeHolder={Object.entries(priorityListHolder)[0].join(':')}
+        data={priorityList.data}
+        onAddItem={priorityList.addItem}
+        onDeleteItem={priorityList.deleteItem}
+        tip="Add priorityList to words found in job descriptions ranging from -100~100"
       >
         <AdjustmentsVerticalIcon />
       </Input>
@@ -165,4 +149,4 @@ const Filter: React.FC = () => {
   );
 };
 
-export default Filter;
+export default ConfigEditor;

@@ -5,14 +5,14 @@ import { useSearchResultsContext } from '../../contexts/SearchResultsProvider.js
 
 const JobList = () => {
   const { results } = useSearchResultsContext();
-  //const [jobs, setJobs] = useState<Job[]>([]);
+  const [jobs, setJobs] = useState<Job[]>([]);
 
-  // useEffect(() => {
-  //   fetch('http://localhost:3000/api/jobs')
-  //     .then((res) => res.json())
-  //     .then((data) => setJobs(data));
-  // }, []);
-  const jobs: Job[] = [];
+  useEffect(() => {
+    fetch('http://localhost:3000/api/jobs')
+      .then((res) => res.json())
+      .then((data) => setJobs(data));
+  }, []);
+  //const jobs: Job[] = [];
 
   const filteredJobs = results.length > 0 ? results : jobs;
 

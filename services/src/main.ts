@@ -1,8 +1,4 @@
-import addJobs from './addJobs/index.js';
-import getAllJobs from './getJobs/index.js';
-import changeRules from './changeRules/index.js';
-import { Job, Config } from './types.js';
+import jobs from './jobs/index.js';
+import configs from './configs/index.js';
 
-//addJobs();
-
-export { addJobs, getAllJobs, changeRules, Job, Config };
+export { jobs, configs };

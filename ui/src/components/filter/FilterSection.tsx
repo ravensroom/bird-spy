@@ -1,4 +1,4 @@
-import FilterItem from './components/FilterItem';
+import FilterItem from './components/ConfigEditor';
 import TabItem from './components/TabItem';
 import Tabs from './components/Tabs';
 

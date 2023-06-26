@@ -1,10 +1,10 @@
-import { writeFile, access } from 'fs/promises';
-import { Job } from '../types.js';
-import { SearchOptions } from './index.js';
+import { Config, TimeRange, Job } from '../../types.js';
+import { writeFile, access, mkdir } from 'fs/promises';
 import getParsedHTML from '../utils/getParsedHTML.js';
 import getPriorityPoints from '../utils/getPriorityPoints.js';
 import { jobIsDesired } from '../utils/jobIsDesired.js';
-import { DB_PATH_BASE, MAX_ENTRIES_PER_QUERY } from '../env.js';
+import { DB_PATH_BASE, MAX_ENTRIES_PER_QUERY } from '../../env.js';
+import userExists from '../../users/userExists.js';
 
 const linkedIn = {
   url: {
@@ -21,8 +21,15 @@ const linkedIn = {
   maxEntriesPerPage: 25,
 };
 
-async function addLinkedInJobs(searchOptions: SearchOptions): Promise<void> {
-  const { listOfSearchKeywords } = searchOptions;
+async function addLinkedInJobs(userId: string, config: Config): Promise<void> {
+  const {
+    listOfSearchKeywords,
+    timeRange,
+    location,
+    priorityList,
+    titleExcludes,
+    titleIncludes,
+  } = config.body;
   const jobs = new Map<string, number[]>();
   let totalAdded = 0;
 
@@ -34,7 +41,7 @@ async function addLinkedInJobs(searchOptions: SearchOptions): Promise<void> {
     let lastAddedAt = 0;
     // paginations
     do {
-      const url = getFullQueryUrl(searchOptions, keywords, start);
+      const url = getFullQueryUrl(timeRange, location, keywords, start);
       const $ = await getParsedHTML(url);
       if ($ instanceof Error) {
         console.log(
@@ -72,7 +79,7 @@ async function addLinkedInJobs(searchOptions: SearchOptions): Promise<void> {
         }
         jobs.set(jobId, [start, count]);
 
-        const isDesired = jobIsDesired(title);
+        const isDesired = jobIsDesired(titleIncludes, titleExcludes, title);
         if (!isDesired) {
           console.log(`Skip job of undesired title ${title}`);
           continue;
@@ -85,17 +92,24 @@ async function addLinkedInJobs(searchOptions: SearchOptions): Promise<void> {
           continue;
         }
 
-        const { priority, priorityHits } = getPriorityPoints(description);
+        const { priorityPoints, priorityHits } = getPriorityPoints(
+          priorityList,
+          description
+        );
 
         const job: Job = {
           id: jobId,
-          title,
-          company,
-          href,
-          location,
-          description,
-          priority,
-          priorityHits,
+          userId,
+          source: 'linkedin',
+          body: {
+            title,
+            company,
+            href,
+            location,
+            description,
+            priorityPoints,
+            priorityHits,
+          },
         };
 
         const fileName = `linkedIn-${jobId}-${title
@@ -104,13 +118,19 @@ async function addLinkedInJobs(searchOptions: SearchOptions): Promise<void> {
           .filter((w) => w)
           .join('_')}.json`;
 
+        const exists = await userExists(userId);
+        const jobsDirName = `${DB_PATH_BASE}/${
+          exists ? 'users' : 'anonymous'
+        }/${userId}/jobs`;
+        await mkdir(jobsDirName, { recursive: true });
+
         try {
-          await access(DB_PATH_BASE + '/' + fileName);
+          await access(jobsDirName + '/' + fileName);
           console.log('File exists');
         } catch (e: any) {
           try {
-            await writeFile(DB_PATH_BASE + '/' + fileName, JSON.stringify(job));
-            console.log(`Added ${fileName} to db`);
+            await writeFile(jobsDirName + '/' + fileName, JSON.stringify(job));
+            console.log(`Added ${fileName} to ${jobsDirName}`);
             lastAddedAt = count;
             totalAdded += 1;
           } catch (err) {
@@ -130,12 +150,11 @@ async function addLinkedInJobs(searchOptions: SearchOptions): Promise<void> {
 }
 
 function getFullQueryUrl(
-  searchOptions: SearchOptions,
+  timeRange: TimeRange,
+  location: string,
   keywords: string,
   start: number
 ) {
-  const { timeRange, location } = searchOptions;
-  //@ts-nocheck
   const url =
     linkedIn.url.searchBase +
     linkedIn.url.timeRange[timeRange] +

@@ -1,15 +1,15 @@
 import { useState } from 'react';
-import { Priorities } from '../components/FilterItem';
+import { PriorityList } from '@type/types';
 
-type UseDataList = {
-  data: string[] | Priorities;
+export type UseDataList = {
+  data: string[] | PriorityList;
   addItem: (item: string) => void;
   deleteItem: (item: string) => void;
   clearAllItems: () => void;
 };
 
-function useDataList(initialData: string[] | Priorities): UseDataList {
-  const [data, setData] = useState<string[] | Priorities>(initialData);
+function useDataList(initialData: string[] | PriorityList): UseDataList {
+  const [data, setData] = useState<string[] | PriorityList>(initialData);
 
   const addItem = (item: string) => {
     if (Array.isArray(data)) {
