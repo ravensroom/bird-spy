@@ -1,15 +1,16 @@
 import { ConfigBody } from '../../../types/types';
 import { UseDataList } from './useDataList';
 
-export default function useForm(dataListArray: UseDataList[]) {
+export default function useAllData(dataListArray: UseDataList[]) {
   const clearAllItems = () => {
     for (let dataList of dataListArray) {
       dataList.clearAllItems();
     }
   };
+
   const getConfigBody = (): ConfigBody => {
     const data: ConfigBody = {
-      location: '',
+      location: 'united states',
       timeRange: 'by day',
       listOfSearchKeywords: [],
       titleIncludes: [],
@@ -17,7 +18,14 @@ export default function useForm(dataListArray: UseDataList[]) {
       priorityList: {},
     };
     for (let dataList of dataListArray) {
-      data[dataList.name] = dataList.data;
+      if (dataList.name === 'location' || dataList.name === 'timeRange') {
+        if (dataList.data.length === 0) continue;
+        //@ts-ignore
+        data[dataList.name] = dataList.data[0];
+      } else {
+        //@ts-ignore
+        data[dataList.name] = dataList.data;
+      }
     }
     return data as ConfigBody;
   };

@@ -1,14 +1,14 @@
 import React, { useState, ChangeEvent, KeyboardEvent } from 'react';
 import InputItem from './InputItem';
 import IconTip from './IconTip';
-import { Priorities } from './ConfigEditor';
+import { PriorityList } from '../../../types/types';
 
 interface InputProps {
   id: string;
   children: React.ReactNode;
   placeHolder?: string;
   tip?: string;
-  data: string[] | Priorities;
+  data: string[] | PriorityList;
   onAddItem: (value: string) => void;
   onDeleteItem: (value: string) => void;
 }

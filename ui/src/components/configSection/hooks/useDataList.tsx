@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { PriorityList } from '../../../types/types';
+import { PriorityList, ConfigBody } from '../../../types/types';
 
 export type UseDataList = {
-  name: string;
+  name: keyof ConfigBody;
   data: string[] | PriorityList;
   addItem: (item: string) => void;
   deleteItem: (item: string) => void;
@@ -10,13 +10,15 @@ export type UseDataList = {
 };
 
 function useDataList(
-  name: string,
+  name: keyof ConfigBody,
   initialData: string[] | PriorityList
 ): UseDataList {
   const [data, setData] = useState<string[] | PriorityList>(initialData);
 
   const addItem = (item: string) => {
     if (Array.isArray(data)) {
+      if ((name === 'timeRange' || name === 'location') && data.length > 0)
+        return;
       if (!data.includes(item)) {
         setData([...data, item]);
       }

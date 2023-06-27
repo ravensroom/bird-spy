@@ -15,6 +15,8 @@ const getConfigs = (userId: string): Promise<Config[]> => {
   return fetch(url, {}).then((response) => response.json());
 };
 
+// const getLocalConfigs =
+
 const addJobs = (userId: string, config: Config): Promise<void> => {
   return fetch('http://localhost:3000/api/jobs', {
     method: 'POST',

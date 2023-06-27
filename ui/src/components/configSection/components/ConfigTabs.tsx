@@ -2,7 +2,7 @@ import React, { FunctionComponentElement, useState } from 'react';
 import ConfigEditor, { ConfigEditorProps } from './ConfigEditor';
 import { v4 as uuidv4 } from 'uuid';
 import { Config } from '../../../types/types';
-import { TrashIcon } from '@heroicons/react/24/outline';
+import { TrashIcon, PencilSquareIcon } from '@heroicons/react/24/outline';
 
 export interface ConfigTabsProps {
   defaultIndex?: number;
@@ -21,6 +21,7 @@ const ConfigTabs: React.FC<ConfigTabsProps> = ({
     React.Children.toArray(children)
   );
   const [activeIndex, setActiveIndex] = useState(defaultIndex);
+  const [editMode, setEditMode] = useState(false);
 
   const getDefaultConfig = () => {
     return {
@@ -101,11 +102,30 @@ const ConfigTabs: React.FC<ConfigTabsProps> = ({
     return tabs.map((tab, index) => {
       const childElement = tab as FunctionComponentElement<ConfigEditorProps>;
       const label = childElement.props.config.name;
+
+      const handleInputChange = (
+        event: React.ChangeEvent<HTMLInputElement>
+      ) => {
+        const newLabel = event.target.value;
+        const newTabs = [...tabs];
+        //@ts-ignore
+        newTabs[index].props.config.name = newLabel;
+        setTabs(newTabs);
+      };
+
+      const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+        if (event.key === 'Enter') {
+          setEditMode(false);
+        }
+      };
+
       return (
         <li
           className={`${
             index === activeIndex ? 'bg-transparent' : ''
-          } text-sm rounded-r-md py-1 px-2 cursor-pointer border-r-2 bg-pink-200 bg-opacity-50 border-r-slate-300 hover:bg-pink-100`}
+          } flex items-center px-2 py-1 text-sm rounded-r-md ${
+            editMode && index === activeIndex ? 'py-0 px-1' : ''
+          }  cursor-pointer border-r-2 bg-pink-200 bg-opacity-50 border-r-slate-300 hover:bg-pink-100`}
           key={`nav-item-${index}`}
           onClick={() => {
             handleClick(index);
@@ -115,7 +135,19 @@ const ConfigTabs: React.FC<ConfigTabsProps> = ({
           onDragOver={handleDragOver}
           onDrop={(event) => handleDrop(event, index)}
         >
-          {label}
+          {editMode && index === activeIndex ? (
+            <input
+              type="text"
+              value={label}
+              onChange={handleInputChange}
+              onKeyDown={handleKeyDown}
+              autoFocus
+              style={{ width: `${label.length + 1}ch` }}
+              className={`h-auto p-1 bg-opacity-60 rounded-md bg-white text-sm outline-none`}
+            />
+          ) : (
+            <span>{label}</span>
+          )}
         </li>
       );
     });
@@ -129,21 +161,33 @@ const ConfigTabs: React.FC<ConfigTabsProps> = ({
   };
   return (
     <div className={``}>
-      <ul className={`flex mx-2 overflow-x-auto`}>
-        {renderedNavLinks()}{' '}
+      <ul className={`flex mx-2 `}>
+        <ul className="flex overflow-x-auto">{renderedNavLinks()} </ul>
+
         <button
           onClick={handleAddTab}
-          className="text-sm rounded-r-md py-1 px-2 cursor-pointer border-r-2 bg-pink-200 bg-opacity-50 border-r-slate-300 hover:bg-pink-100"
+          className="active:text-indigo-800 transition-all text-sm rounded-r-md py-1 px-2 cursor-pointer border-r-2 bg-pink-200 bg-opacity-50 border-r-slate-300 hover:bg-pink-100"
           key="add-tab-button"
         >
           +
         </button>
         <li
           onClick={() => handleDeleteTab(activeIndex || 0)}
-          className="flex items-center text-sm rounded-r-md py-1 px-[6px] cursor-pointer border-r-2 bg-pink-200 bg-opacity-50 border-r-slate-300 hover:bg-pink-100"
-          key="delete-tab-button"
+          className={`active:text-indigo-800  flex items-center text-sm rounded-r-md py-1 px-[6px] cursor-pointer border-r-2 bg-pink-200 bg-opacity-50 border-r-slate-300 hover:bg-pink-100"
+          key="delete-tab-button`}
         >
           <TrashIcon className="w-[15px] h-[15px]" />
+        </li>
+        <li
+          onClick={() => {
+            setEditMode(!editMode);
+          }}
+          className={`${
+            editMode ? 'text-indigo-800' : ''
+          } flex items-center text-sm rounded-r-md py-1 px-[6px] cursor-pointer border-r-2 bg-pink-200 bg-opacity-50 border-r-slate-300 hover:bg-pink-100`}
+          key="edit-tab-button"
+        >
+          <PencilSquareIcon className="w-[15px] h-[15px]" />
         </li>
       </ul>
       <div className={`p-2 rounded-sm`}>{renderContent()}</div>

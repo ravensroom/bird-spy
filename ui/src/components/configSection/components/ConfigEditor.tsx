@@ -12,9 +12,9 @@ import ActionButton from './ActionButton';
 import { useSaveMessageContext } from '../../../contexts/SaveMessageProvider';
 import { useSearchResultsContext } from '../../../contexts/SearchResultsProvider';
 import { useUserIdContext } from '../../../contexts/UserIdProvider';
-import useForm from '../hooks/useAllData';
 import api from '../../../apis/api';
-import { Config } from '../../../types/types';
+import { Config, ConfigBody } from '../../../types/types';
+import useAllData from '../hooks/useAllData';
 
 const listOfSearchKeywordsHolder = 'software developer';
 const titleIncludesHolder = 'junior';
@@ -29,15 +29,35 @@ export interface ConfigEditorProps {
 }
 
 const ConfigEditor: React.FC<ConfigEditorProps> = ({ id, config }) => {
-  const listOfSearchKeywords = useDataList('listOfSearchKeywords', [
-    listOfSearchKeywordsHolder,
+  const localData = localStorage.getItem(`config-${id}`);
+  const localConfigBody: ConfigBody | null = localData
+    ? JSON.parse(localData).body
+    : null;
+  const propsConfigBody = config.body;
+  const listOfSearchKeywords = useDataList(
+    'listOfSearchKeywords',
+    localConfigBody?.listOfSearchKeywords ||
+      propsConfigBody.listOfSearchKeywords
+  );
+  const titleIncludes = useDataList(
+    'titleIncludes',
+    localConfigBody?.titleIncludes || config.body.titleIncludes
+  );
+  const titleExcludes = useDataList(
+    'titleExcludes',
+    localConfigBody?.titleExcludes || config.body.titleExcludes
+  );
+  const priorityList = useDataList(
+    'priorityList',
+    localConfigBody?.priorityList || config.body.priorityList
+  );
+  const location = useDataList('location', [
+    localConfigBody?.location || config.body.location,
   ]);
-  const titleIncludes = useDataList('titleIncludes', config.body.titleIncludes);
-  const titleExcludes = useDataList('titleExcludes', config.body.titleExcludes);
-  const priorityList = useDataList('priorityList', config.body.priorityList);
-  const location = useDataList('location', [config.body.location]);
-  const timeRange = useDataList('timeRange', [config.body.timeRange]);
-  const form = useForm([
+  const timeRange = useDataList('timeRange', [
+    localConfigBody?.timeRange || config.body.timeRange,
+  ]);
+  const form = useAllData([
     listOfSearchKeywords,
     titleIncludes,
     titleExcludes,
@@ -56,6 +76,11 @@ const ConfigEditor: React.FC<ConfigEditorProps> = ({ id, config }) => {
   };
 
   const handleSave = () => {
+    if (listOfSearchKeywords.data.length === 0) {
+      setHeaderMessage('Please enter queries!');
+      setTimeout(() => setHeaderMessage(''), 3000);
+      return;
+    }
     const configBody = form.getConfigBody();
     const configData = {
       id,
@@ -66,6 +91,7 @@ const ConfigEditor: React.FC<ConfigEditorProps> = ({ id, config }) => {
     api.configs
       .saveConfig(configData)
       .then(() => {
+        localStorage.setItem(`config-${id}`, JSON.stringify(configData));
         setHeaderMessage('Successfully saved!');
         setTimeout(() => setHeaderMessage(''), 3000);
       })
@@ -112,7 +138,7 @@ const ConfigEditor: React.FC<ConfigEditorProps> = ({ id, config }) => {
         data={priorityList.data}
         onAddItem={priorityList.addItem}
         onDeleteItem={priorityList.deleteItem}
-        tip="Add priorityList to words found in job descriptions ranging from -100~100"
+        tip="Add priorityList to words found in job descriptions"
       >
         <AdjustmentsVerticalIcon />
       </Input>
