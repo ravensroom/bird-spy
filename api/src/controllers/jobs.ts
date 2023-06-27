@@ -23,3 +23,28 @@ export async function getJobs(req: Request, res: Response) {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 }
+
+export async function rmJobs(req: Request, res: Response) {
+  try {
+    const userId = req.query.userId as string;
+    // stop the running scraper
+    if (jobs.hasRunningInstance()) {
+      jobs.stopAdding();
+      await jobs.stoppedAdding();
+    }
+    await jobs.rmJobs(userId);
+    res.status(201).json({ msg: 'Finished removing' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+}
+
+export const isRunning = async (req: Request, res: Response) => {
+  try {
+    res.status(201).json({ hasRunningJob: jobs.hasRunningInstance() });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};

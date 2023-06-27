@@ -18,7 +18,6 @@ export default async function getJobs(userId: string) {
       const job: Job = JSON.parse(data);
       jobs.push(job);
     }
-    console.log(`Fetched ${jobs.length} jobs from ${jobsDirName}`);
     return jobs;
   } catch (err) {
     console.error(err);

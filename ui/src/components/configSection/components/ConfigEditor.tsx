@@ -15,6 +15,7 @@ import { useUserIdContext } from '../../../contexts/UserIdProvider';
 import api from '../../../apis/api';
 import { Config, ConfigBody } from '../../../types/types';
 import useAllData from '../hooks/useAllData';
+import { useState } from 'react';
 
 const listOfSearchKeywordsHolder = 'software developer';
 const titleIncludesHolder = 'junior';
@@ -68,8 +69,21 @@ const ConfigEditor: React.FC<ConfigEditorProps> = ({ id, config }) => {
   const { setHeaderMessage } = useSaveMessageContext();
   const { setResults } = useSearchResultsContext();
   const { userId } = useUserIdContext();
+  const [isSearching, setIsSearching] = useState(false);
+  const [fetchInterval, setFetchInterval] = useState<NodeJS.Timer | null>(null);
 
-  const handleSearch = () => {
+  const handleSearch = async () => {
+    if (fetchInterval) clearInterval(fetchInterval);
+    if (listOfSearchKeywords.data.length === 0) {
+      // clear fetchIntervals or all
+      setHeaderMessage('Please enter queries!');
+      setTimeout(() => setHeaderMessage(''), 3000);
+      return;
+    }
+
+    setResults([]);
+    setIsSearching(true);
+
     const configBody = form.getConfigBody();
     const configData = {
       id,
@@ -77,10 +91,29 @@ const ConfigEditor: React.FC<ConfigEditorProps> = ({ id, config }) => {
       userId,
       body: configBody,
     };
+
+    await api.jobs.rmJobs(userId);
     api.jobs.addJobs(configData);
-    api.jobs.getJobs(userId).then((data) => {
-      setResults(data);
-    });
+
+    const checkStartedRunning = setInterval(async () => {
+      if (await api.jobs.isRunning()) {
+        clearInterval(checkStartedRunning);
+      }
+    }, 200);
+
+    const fetchJobsInterval = setInterval(async () => {
+      console.log(await api.jobs.isRunning());
+      if (await api.jobs.isRunning()) {
+        api.jobs.getJobs(userId).then((data) => {
+          setResults(data);
+        });
+      } else {
+        clearInterval(fetchJobsInterval);
+        setIsSearching(false);
+      }
+    }, 1000);
+
+    setFetchInterval(fetchJobsInterval);
   };
 
   const handleClearAll = () => {
@@ -182,7 +215,7 @@ const ConfigEditor: React.FC<ConfigEditorProps> = ({ id, config }) => {
           Save
         </ActionButton>
         <ActionButton type="submit" onClick={handleSearch}>
-          Search
+          Search{isSearching ? 'ing...' : ''}
         </ActionButton>
       </div>
     </div>

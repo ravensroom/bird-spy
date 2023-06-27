@@ -6,6 +6,9 @@ import { jobIsDesired } from '../utils/jobIsDesired.js';
 import { DB_PATH_BASE, MAX_ENTRIES_PER_QUERY } from '../../env.js';
 import userExists from '../../users/userExists.js';
 
+let shouldTerminate = false;
+let isRunning = false;
+
 const linkedIn = {
   url: {
     searchBase: 'https://www.linkedin.com/jobs/search/?',
@@ -30,6 +33,8 @@ async function addLinkedInJobs(config: Config): Promise<void> {
     titleExcludes,
     titleIncludes,
   } = config.body;
+
+  isRunning = true;
   const jobs = new Map<string, number[]>();
   let totalAdded = 0;
 
@@ -57,22 +62,29 @@ async function addLinkedInJobs(config: Config): Promise<void> {
       const jobCards = $('.jobs-search__results-list .base-card');
       // process all jobs from start, total numbers: linkedIn.maxEntriesPerPage
       for (const jobCard of jobCards) {
+        if (shouldTerminate) {
+          shouldTerminate = false;
+          isRunning = false;
+          console.log('Running scraper terminated');
+          return;
+        }
         count++;
         const jobId = $(jobCard)?.attr('data-entity-urn')?.split(':').at(-1);
         if (!jobId) continue;
 
         const { title, company, location } = getJobInfo($, jobCard);
-        console.log(
-          `${keywords}: at ${count} job / ${totalEntries} of title ${title}`
-        );
+        // console.log(
+        //   `${keywords}: at ${count} job / ${totalEntries} of title ${title}`
+        // );
         if (jobs.has(jobId)) {
-          console.log(
-            `Job (${title}) visited at [start, count]: ${jobs.get(jobId)}`,
+          // console.log(
+          //   `Job (${title}) visited at [start, count]: ${jobs.get(jobId)}`,
 
-            `Last add at ${lastAddedAt}`
-          );
+          //   `Last add at ${lastAddedAt}`
+          // );
           if (count - lastAddedAt > 500) {
             console.log(`Long time no add..., break. Added`, totalAdded);
+            isRunning = false;
             return;
           }
           continue;
@@ -81,7 +93,7 @@ async function addLinkedInJobs(config: Config): Promise<void> {
 
         const isDesired = jobIsDesired(titleIncludes, titleExcludes, title);
         if (!isDesired) {
-          console.log(`Skip job of undesired title ${title}`);
+          //console.log(`Skip job of undesired title ${title}`);
           continue;
         }
 
@@ -126,11 +138,17 @@ async function addLinkedInJobs(config: Config): Promise<void> {
 
         try {
           await access(jobsDirName + '/' + fileName);
-          console.log('File exists');
+          //console.log('File exists');
         } catch (e: any) {
           try {
+            if (shouldTerminate) {
+              shouldTerminate = false;
+              isRunning = false;
+              console.log('Running scraper terminated');
+              return;
+            }
             await writeFile(jobsDirName + '/' + fileName, JSON.stringify(job));
-            console.log(`Added ${fileName} to ${jobsDirName}`);
+            //console.log(`Added ${fileName} to ${jobsDirName}`);
             lastAddedAt = count;
             totalAdded += 1;
           } catch (err) {
@@ -147,6 +165,7 @@ async function addLinkedInJobs(config: Config): Promise<void> {
     } while (start < getBoundary(MAX_ENTRIES_PER_QUERY, totalEntries));
   }
   console.log('Query completed, added', totalAdded);
+  isRunning = false;
 }
 
 function getFullQueryUrl(
@@ -208,5 +227,27 @@ function getBoundary(maxEntriesPerQuery: number, totalEntries: number): number {
     ? Math.min(maxEntriesPerQuery, totalEntries)
     : totalEntries;
 }
+
+export const stopAdding = () => {
+  shouldTerminate = true;
+};
+
+export const hasRunningInstance = () => {
+  return isRunning;
+};
+
+export const stoppedAdding = () => {
+  return new Promise((resolve, reject) => {
+    const checkTermination = () => {
+      if (!shouldTerminate) {
+        resolve(true);
+      } else {
+        setTimeout(checkTermination, 100);
+      }
+    };
+
+    checkTermination();
+  });
+};
 
 export default addLinkedInJobs;

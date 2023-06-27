@@ -24,9 +24,7 @@ const addJobs = (config: Config): Promise<void> => {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(config),
-  }).then((response) => {
-    console.log('Finished adding', response.json());
-  });
+  }).then((response) => response.json());
 };
 
 const getJobs = (userId: string): Promise<Job[]> => {
@@ -34,11 +32,28 @@ const getJobs = (userId: string): Promise<Job[]> => {
   return fetch(url, {}).then((response) => response.json());
 };
 
+const rmJobs = (userId: string): Promise<Job[]> => {
+  const url = `http://localhost:3000/api/jobs/rm?userId=${userId}`;
+  return fetch(url, {}).then((response) => response.json());
+};
+
+const isRunning = async () => {
+  const { hasRunningJob } = await fetch(
+    'http://localhost:3000/api/jobs/run',
+    {}
+  ).then((response) => {
+    return response.json();
+  });
+  return hasRunningJob;
+};
+
 const configs = { saveConfig, getConfigs };
 
 const jobs = {
   addJobs,
   getJobs,
+  rmJobs,
+  isRunning,
 };
 
 const api = {

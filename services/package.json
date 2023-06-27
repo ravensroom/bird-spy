@@ -13,7 +13,8 @@
     "axios": "^1.4.0",
     "cheerio": "^1.0.0-rc.12",
     "node-cron": "^3.0.2",
-    "socket.io": "^4.7.0"
+    "socket.io": "^4.7.0",
+    "uuid": "^8.3.2"
   },
   "type": "module",
   "devDependencies": {
