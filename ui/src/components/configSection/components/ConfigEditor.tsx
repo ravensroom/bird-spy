@@ -102,7 +102,6 @@ const ConfigEditor: React.FC<ConfigEditorProps> = ({ id, config }) => {
     }, 200);
 
     const fetchJobsInterval = setInterval(async () => {
-      console.log(await api.jobs.isRunning());
       if (await api.jobs.isRunning()) {
         api.jobs.getJobs(userId).then((data) => {
           setResults(data);

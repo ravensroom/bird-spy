@@ -1,4 +1,11 @@
-import { mkdir, readdir, readFile, writeFile, access } from 'fs/promises';
+import {
+  mkdir,
+  readdir,
+  readFile,
+  writeFile,
+  unlink,
+  access,
+} from 'fs/promises';
 import { Config } from '../types.js';
 import { DB_PATH_BASE } from '../env.js';
 import userExists from '../users/userExists.js';
@@ -20,6 +27,21 @@ const saveConfig = async (config: Config): Promise<void> => {
     console.log('Error writing to config', e);
   }
 };
+
+const rmConfig = async (userId: string, configId: string): Promise<void> => {
+  try {
+    const exists = await userExists(userId);
+    const configDirName = `${DB_PATH_BASE}/${
+      exists ? 'users' : 'anonymous'
+    }/${userId}/configs`;
+    await mkdir(configDirName, { recursive: true });
+    await unlink(configDirName + '/' + configId + '.json');
+    console.log('Removed config from', configDirName);
+  } catch (e) {
+    console.log('Error removing config', e);
+  }
+};
+
 const getConfigs = async (userId: string): Promise<Config[]> => {
   try {
     const exists = await userExists(userId);
@@ -53,18 +75,18 @@ const getConfigById = async (
     const exists = await userExists(userId);
     const configDirName = `${DB_PATH_BASE}/${
       exists ? 'users' : 'anonymous'
-    }/configs`;
-
+    }/${userId}/configs`;
+    await access(`${configDirName}/${configId}.json`);
     const configData = await readFile(
       `${configDirName}/${configId}.json`,
       'utf-8'
     );
     return JSON.parse(configData) as Config;
   } catch (error) {
-    console.log('Error reading configs:', error);
+    console.log('Error reading config');
     return null;
   }
 };
 
-const configs = { saveConfig, getConfigs, getConfigById };
+const configs = { saveConfig, getConfigs, getConfigById, rmConfig };
 export default configs;

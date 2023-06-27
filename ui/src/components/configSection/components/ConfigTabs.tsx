@@ -3,6 +3,7 @@ import ConfigEditor, { ConfigEditorProps } from './ConfigEditor';
 import { v4 as uuidv4 } from 'uuid';
 import { Config } from '../../../types/types';
 import { TrashIcon, PencilSquareIcon } from '@heroicons/react/24/outline';
+import api from '../../../apis/api';
 
 export interface ConfigTabsProps {
   defaultIndex?: number;
@@ -52,7 +53,19 @@ const ConfigTabs: React.FC<ConfigTabsProps> = ({
     setActiveIndex(newTabs.length - 1);
   };
 
-  const handleDeleteTab = (index: number) => {
+  const handleDeleteTab = async (index: number) => {
+    const targetTab = tabs[
+      index
+    ] as FunctionComponentElement<ConfigEditorProps>;
+    const { config } = targetTab.props;
+    const configSaved = (await api.configs.getConfigById(
+      config.userId,
+      config.id
+    ))
+      ? true
+      : false;
+    if (configSaved) api.configs.rmConfig(config.userId, config.id);
+    localStorage.removeItem(`config-${config.id}`);
     const newTabs = [...tabs];
     newTabs.splice(index, 1);
     setTabs(newTabs);
@@ -123,9 +136,7 @@ const ConfigTabs: React.FC<ConfigTabsProps> = ({
         <li
           className={`${
             index === activeIndex ? 'bg-transparent' : ''
-          } flex items-center px-2 py-1 text-sm rounded-r-md ${
-            editMode && index === activeIndex ? 'py-0 px-1' : ''
-          }  cursor-pointer border-r-2 bg-pink-200 bg-opacity-50 border-r-slate-300 hover:bg-pink-100`}
+          } flex items-center px-2 py-1 text-sm rounded-r-md cursor-pointer border-r-2 bg-pink-200 bg-opacity-50 border-r-slate-300 hover:bg-pink-100`}
           key={`nav-item-${index}`}
           onClick={() => {
             handleClick(index);
@@ -142,8 +153,8 @@ const ConfigTabs: React.FC<ConfigTabsProps> = ({
               onChange={handleInputChange}
               onKeyDown={handleKeyDown}
               autoFocus
-              style={{ width: `${label.length + 1}ch` }}
-              className={`h-auto p-1 bg-opacity-60 rounded-md bg-white text-sm outline-none`}
+              style={{ width: `${Math.max(label.length, 4)}ch` }}
+              className={`h-auto bg-opacity-60 rounded-md bg-white text-sm outline-none`}
             />
           ) : (
             <span>{label}</span>

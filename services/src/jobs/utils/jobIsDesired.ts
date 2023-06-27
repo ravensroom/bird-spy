@@ -4,12 +4,12 @@ export function jobIsDesired(
   title: string
 ): boolean {
   const titleWords = title.split(/[\s(),.;\-|\/]+/);
-  let isDesired = false;
 
   for (let word of titleWords) {
     word = word.toLowerCase();
     if (titleExcludes.includes(word)) return false;
-    if (titleIncludes.includes(word)) isDesired = true;
+    if (titleIncludes.includes(word) || titleIncludes.length === 0) return true;
   }
-  return isDesired;
+
+  return false;
 }

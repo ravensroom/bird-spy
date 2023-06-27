@@ -8,7 +8,7 @@ export default function getPriorityPoints(
   const text = description.toLowerCase();
   let priorityPoints = 0;
   for (const keyword in priorityList) {
-    if (text.indexOf(keyword) > 0) {
+    if (text.indexOf(keyword) !== -1) {
       priorityPoints += priorityList[keyword];
       priorityHits.push(`${keyword}:${priorityList[keyword]}`);
     }

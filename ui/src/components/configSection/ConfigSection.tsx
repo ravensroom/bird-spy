@@ -27,10 +27,17 @@ const ConfigSection = () => {
   useEffect(() => {
     if (userId) {
       setDefaultConfig({ ...defaultConfig, userId });
-      api.configs.getConfigs(userId).then((data) => {
-        setConfigs(data);
+      const localConfigs = api.configs.getLocalConfigs();
+      if (localConfigs.length) {
+        console.log('Loaded from localStorage');
+        setConfigs(localConfigs);
         setLoading(false);
-      });
+      } else {
+        api.configs.getConfigs(userId).then((data) => {
+          setConfigs(data);
+          setLoading(false);
+        });
+      }
     }
   }, [userId]);
 
