@@ -26,7 +26,7 @@ const JobList = () => {
         {filteredJobs
           .sort((a, b) => b.body.priorityPoints - a.body.priorityPoints)
           .map((job) => (
-            <JobItem key={job.id} job={job} />
+            <JobItem key={job.userId + job.id} job={job} />
           ))}
       </div>
     </>

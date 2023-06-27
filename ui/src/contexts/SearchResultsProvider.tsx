@@ -1,4 +1,4 @@
-import { Job } from '@bird-spy/services/src/main';
+import { Job } from '../types/types';
 import React, { createContext, useContext, useState } from 'react';
 
 interface SearchResultsProviderProps {
@@ -7,7 +7,7 @@ interface SearchResultsProviderProps {
 
 interface ISearchResultsContext {
   results: Job[];
-  setResults: React.Dispatch<React.SetStateAction<never[]>>;
+  setResults: React.Dispatch<React.SetStateAction<Job[]>>;
 }
 
 export const SearchResultsContext = createContext<
@@ -27,7 +27,7 @@ export const useSearchResultsContext = () => {
 const SearchResultsProvider: React.FC<SearchResultsProviderProps> = ({
   children,
 }) => {
-  const [results, setResults] = useState([]);
+  const [results, setResults] = useState<Job[]>([]);
 
   return (
     <SearchResultsContext.Provider value={{ results, setResults }}>

@@ -69,7 +69,19 @@ const ConfigEditor: React.FC<ConfigEditorProps> = ({ id, config }) => {
   const { setResults } = useSearchResultsContext();
   const { userId } = useUserIdContext();
 
-  const handleSearch = () => {};
+  const handleSearch = () => {
+    const configBody = form.getConfigBody();
+    const configData = {
+      id,
+      name: config.name,
+      userId,
+      body: configBody,
+    };
+    api.jobs.addJobs(configData);
+    api.jobs.getJobs(userId).then((data) => {
+      setResults(data);
+    });
+  };
 
   const handleClearAll = () => {
     form.clearAllItems();
@@ -84,7 +96,7 @@ const ConfigEditor: React.FC<ConfigEditorProps> = ({ id, config }) => {
     const configBody = form.getConfigBody();
     const configData = {
       id,
-      name: config?.name || 'New Search',
+      name: config.name,
       userId,
       body: configBody,
     };

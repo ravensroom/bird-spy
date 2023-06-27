@@ -77,7 +77,7 @@ const JobItem: React.FC<JobItemProps> = ({ job }) => {
               <div className="flex flex-wrap leading-[7px] my-2 gap-2 text-xs text-gray-500">
                 <span>{` .${priorityPoints} | `}</span>
                 {priorityHits.map((item, index) => (
-                  <span>{`${item}${
+                  <span key={index}>{`${item}${
                     index === priorityHits.length - 1 ? '' : ','
                   }`}</span>
                 ))}

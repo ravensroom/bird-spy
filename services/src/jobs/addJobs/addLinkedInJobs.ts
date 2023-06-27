@@ -21,7 +21,7 @@ const linkedIn = {
   maxEntriesPerPage: 25,
 };
 
-async function addLinkedInJobs(userId: string, config: Config): Promise<void> {
+async function addLinkedInJobs(config: Config): Promise<void> {
   const {
     listOfSearchKeywords,
     timeRange,
@@ -99,7 +99,7 @@ async function addLinkedInJobs(userId: string, config: Config): Promise<void> {
 
         const job: Job = {
           id: jobId,
-          userId,
+          userId: config.userId,
           source: 'linkedin',
           body: {
             title,
@@ -118,10 +118,10 @@ async function addLinkedInJobs(userId: string, config: Config): Promise<void> {
           .filter((w) => w)
           .join('_')}.json`;
 
-        const exists = await userExists(userId);
+        const exists = await userExists(config.userId);
         const jobsDirName = `${DB_PATH_BASE}/${
           exists ? 'users' : 'anonymous'
-        }/${userId}/jobs`;
+        }/${config.userId}/jobs`;
         await mkdir(jobsDirName, { recursive: true });
 
         try {

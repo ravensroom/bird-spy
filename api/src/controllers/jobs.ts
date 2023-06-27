@@ -4,9 +4,9 @@ import { jobs } from '@bird-spy/services/dist/main.js';
 
 export const addJobs = async (req: Request, res: Response) => {
   try {
-    const { userId, config } = req.body;
-    await jobs.addJobs(userId, config);
-    res.status(201).json({ msg: 'Jobs added' });
+    const config = req.body;
+    await jobs.addJobs(config);
+    res.status(201).json({ msg: 'Finished adding' });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal Server Error' });
