@@ -2,6 +2,7 @@ interface ActionButtonProps {
   type: 'submit' | 'clear' | 'save';
   children: React.ReactNode;
   onClick: () => void;
+  className?: string;
 }
 
 const ActionButton: React.FC<ActionButtonProps> = ({

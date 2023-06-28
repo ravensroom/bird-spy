@@ -74,6 +74,12 @@ const ConfigEditor: React.FC<ConfigEditorProps> = ({ id, config }) => {
 
   const handleSearch = async () => {
     if (fetchInterval) clearInterval(fetchInterval);
+    if (isSearching) {
+      setIsSearching(false);
+      await api.jobs.rmJobs(userId);
+      return;
+    }
+
     if (listOfSearchKeywords.data.length === 0) {
       // clear fetchIntervals or all
       setHeaderMessage('Please enter queries!');
@@ -214,7 +220,11 @@ const ConfigEditor: React.FC<ConfigEditorProps> = ({ id, config }) => {
           Save
         </ActionButton>
         <ActionButton type="submit" onClick={handleSearch}>
-          Search{isSearching ? 'ing...' : ''}
+          {isSearching ? (
+            <span className="running-dot font-bold"></span>
+          ) : (
+            'Search'
+          )}
         </ActionButton>
       </div>
     </div>

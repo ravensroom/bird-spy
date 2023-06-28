@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import ConfigEditor from './components/ConfigEditor';
-import Tabs from './components/ConfigTabs';
+import ConfigTabs from './components/ConfigTabs';
 import api from '../../apis/api';
 import { useUserIdContext } from '../../contexts/UserIdProvider';
 import { Config } from '../../types/types';
@@ -9,7 +9,7 @@ import { v4 as uuidv4 } from 'uuid';
 const ConfigSection = () => {
   const [configs, setConfigs] = useState<Config[]>([]);
   const [defaultConfig, setDefaultConfig] = useState<Config>({
-    id: uuidv4(),
+    id: '',
     name: 'New Search',
     userId: '',
     body: {
@@ -29,7 +29,7 @@ const ConfigSection = () => {
       setDefaultConfig({ ...defaultConfig, userId });
       const localConfigs = api.configs.getLocalConfigs();
       if (localConfigs.length) {
-        console.log('Loaded from localStorage');
+        console.log('Loaded configs from localStorage');
         setConfigs(localConfigs);
         setLoading(false);
       } else {
@@ -44,8 +44,8 @@ const ConfigSection = () => {
   if (loading) return null;
 
   return (
-    <div className="sm:mx-8 md:mx-16 lg:mx-24 rounded-md pt-8 border-2 border-pink-500 border-opacity-50 border-t-0">
-      <Tabs defaultConfig={defaultConfig}>
+    <div className="sm:mx-8 md:mx-16 lg:mx-24 rounded-md pt-8 mb-2 border-2 border-pink-500 border-opacity-50 border-t-0">
+      <ConfigTabs defaultConfig={{ ...defaultConfig }}>
         {configs.length > 0 ? (
           configs.map((config) => (
             <ConfigEditor key={config.id} id={config.id} config={config} />
@@ -57,7 +57,7 @@ const ConfigSection = () => {
             config={defaultConfig}
           />
         )}
-      </Tabs>
+      </ConfigTabs>
     </div>
   );
 };

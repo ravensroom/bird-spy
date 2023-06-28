@@ -1,15 +1,29 @@
-/* Select the scrollbar track */
-::-webkit-scrollbar-track {
-  /* Change the background color */
-  background-color: #f1f1f1;
+@keyframes pacman {
+  0% {
+    content: 'cooooo';
+  }
+  16.67% {
+    content: '-coooo';
+  }
+  33.33% {
+    content: '--cooo';
+  }
+  50% {
+    content: '---coo';
+  }
+  66.67% {
+    content: '----co';
+  }
+  83.33% {
+    content: '-----c';
+  }
+  100% {
+    content: 'Cooooo';
+  }
 }
 
-/* Select the scrollbar thumb */
-::-webkit-scrollbar-thumb {
-  /* Change the background color */
-  background-color: red;
-
-  /* Change the size of the thumb */
-  height: 10px;
-  width: 10px;
+.running-dot::before {
+  font-weight: 'bold';
+  content: 'Cooooo';
+  animation: pacman 2s infinite;
 }

@@ -3,10 +3,10 @@ import { Job } from '../../types/types';
 
 interface JobItemProps {
   job: Job;
+  handleDelete: (id: string) => void;
 }
 
-const JobItem: React.FC<JobItemProps> = ({ job }) => {
-  const [isOpen, setIsOpen] = useState<boolean>(false);
+const JobItem: React.FC<JobItemProps> = ({ job, handleDelete }) => {
   const {
     title,
     company,
@@ -16,34 +16,37 @@ const JobItem: React.FC<JobItemProps> = ({ job }) => {
     priorityPoints,
     priorityHits,
   } = job.body;
+  const [isOpen, setIsOpen] = useState<boolean>(false);
   const headerRef = useRef<HTMLDivElement>(null);
-  const [headerOffsetTop, setHeaderOffsetTop] = useState(0);
+  // const [headerOffsetTop, setHeaderOffsetTop] = useState(0);
   const [isViewd, setIsViewd] = useState<boolean>(false);
 
-  useEffect(() => {
-    const updateHeaderOffsetTop = () => {
-      if (headerRef.current) {
-        setHeaderOffsetTop(headerRef.current.offsetTop);
-      }
-    };
+  // useEffect(() => {
+  //   if (isOpen) return;
+  //   const updateHeaderOffsetTop = () => {
+  //     if (headerRef.current) {
+  //       setHeaderOffsetTop(headerRef.current.offsetTop);
+  //     }
+  //   };
 
-    // Update the offsetTop initially
-    updateHeaderOffsetTop();
+  //   updateHeaderOffsetTop();
 
-    // Add event listener for window resize
-    window.addEventListener('resize', updateHeaderOffsetTop);
+  //   // Add event listener for window resize
+  //   window.addEventListener('resize', updateHeaderOffsetTop);
 
-    // Clean up the event listener on component unmount
-    return () => {
-      window.removeEventListener('resize', updateHeaderOffsetTop);
-    };
-  }, []);
+  //   // Clean up the event listener on component unmount
+  //   return () => {
+  //     window.removeEventListener('resize', updateHeaderOffsetTop);
+  //   };
+  // }, [headerRef.current?.offsetTop, isOpen]);
 
-  const handleClickBird = () => {
-    window.scrollTo({
-      top: headerOffsetTop - 20,
-      behavior: 'instant',
-    });
+  const handleSave = () => {};
+
+  const handleClickOpen = () => {
+    // window.scrollTo({
+    //   top: headerOffsetTop - 20,
+    //   behavior: 'instant',
+    // });
 
     setIsOpen(!isOpen);
     setIsViewd(true);
@@ -54,18 +57,19 @@ const JobItem: React.FC<JobItemProps> = ({ job }) => {
       {/* Job header */}
       <div
         ref={headerRef}
+        onClick={handleClickOpen}
         className={`${
           isOpen || isViewd
             ? 'sticky top-5 bg-indigo-200 bg-opacity-100 shadow-inner border-b-1 border-b-indigo-300'
             : ''
-        } flex justify-between items-center  rounded-md rounded-t-none`}
+        } flex justify-between items-center  rounded-md rounded-t-none cursor-pointer hover:bg-indigo-100`}
       >
         <div className="flex flex-col">
           <div className="leading-[14px] ml-2 mt-1">
             <a
               href={href}
               target="_blank"
-              className={`text-sm text-gray-800 font-bold  ${
+              className={`text-sm text-gray-800 font-bold ${
                 isOpen || isViewd
                   ? 'hover:bg-indigo-300'
                   : 'hover:bg-indigo-200'
@@ -74,7 +78,7 @@ const JobItem: React.FC<JobItemProps> = ({ job }) => {
               {title}
             </a>
             {priorityHits.length > 0 && (
-              <div className="flex flex-wrap leading-[7px] my-2 gap-2 text-xs text-gray-500">
+              <div className="flex flex-wrap leading-[7px] mt-2 gap-2 text-xs text-gray-500">
                 <span>{` .${priorityPoints} | `}</span>
                 {priorityHits.map((item, index) => (
                   <span key={index}>{`${item}${
@@ -84,28 +88,34 @@ const JobItem: React.FC<JobItemProps> = ({ job }) => {
               </div>
             )}
           </div>
-          <div className="text-[12px] mb-1 ml-2 ">
+          <div className="text-[12px] my-1 ml-2 ">
             <span className="text-gray-800">{company}</span>
             <span className="pl-2 text-gray-600">{location}</span>
           </div>
         </div>
 
-        <div
-          onClick={handleClickBird}
-          className="w-8 h-8 pt-2 mr-3 text-[8px] shadow-inner shadow-black font-extrabold rounded-full flex flex-col items-center hover:cursor-pointer hover:bg-indigo-300 hover:bg-opacity-40"
-        >
+        <div className="flex flex-col text-sm h-full ml-1 bg-opacity-40 text-gray-700">
           <div
-            className={`${
-              isOpen ? 'bg-indigo-300' : 'bg-gray-900'
-            } px-[7px] mt-[5px] h-2 shadow-inner shadow-black flex gap-2`}
+            className="bg-indigo-300 hover:bg-indigo-400 active:bg-indigo-500 flex items-center px-1 justify-center  font-extrabold hover:cursor-pointer"
+            onClick={() => {
+              handleDelete(job.id);
+            }}
           >
-            <span>O</span>
-            <span>=</span>
+            x
           </div>
-
-          <div className="text-[8px]">
-            <span className={isOpen ? 'hidden' : 'inline'}>V</span>
-            <span className={isOpen ? 'inline' : 'hidden'}>O</span>
+          <div
+            className="bg-indigo-300 hover:bg-indigo-400 active:bg-indigo-500 flex items-center px-1 justify-center  font-extrabold hover:cursor-pointer"
+            onClick={() => {
+              handleSave();
+            }}
+          >
+            +
+          </div>
+          <div
+            className="bg-indigo-300 hover:bg-indigo-400 active:bg-indigo-500 flex items-center px-1 justify-center  font-extrabold hover:cursor-pointer"
+            onClick={() => {}}
+          >
+            @
           </div>
         </div>
       </div>
