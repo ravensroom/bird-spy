@@ -1,5 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Job } from '../../types/types';
+import api from '../../apis/api';
+import { useArchivesContext } from '../../contexts/ArchivesProvider';
 
 interface JobItemProps {
   job: Job;
@@ -20,6 +22,7 @@ const JobItem: React.FC<JobItemProps> = ({ job, handleDelete }) => {
   const headerRef = useRef<HTMLDivElement>(null);
   // const [headerOffsetTop, setHeaderOffsetTop] = useState(0);
   const [isViewd, setIsViewd] = useState<boolean>(false);
+  const { archives, setArchives } = useArchivesContext();
 
   // useEffect(() => {
   //   if (isOpen) return;
@@ -40,7 +43,25 @@ const JobItem: React.FC<JobItemProps> = ({ job, handleDelete }) => {
   //   };
   // }, [headerRef.current?.offsetTop, isOpen]);
 
-  const handleSave = () => {};
+  const handleSave = () => {
+    setArchives((prev) => {
+      const defaultArchive = prev.filter((arch) => arch.isDefault)[0];
+      defaultArchive.jobs.push(job);
+      localStorage.setItem(
+        `archive-${defaultArchive.id}`,
+        JSON.stringify(defaultArchive)
+      );
+      api.archives.saveArchive(defaultArchive);
+      return prev.map((arch) => {
+        if (arch.id === defaultArchive.id) return { ...defaultArchive };
+        return arch;
+      });
+    });
+
+    handleDelete(job.id);
+  };
+
+  const handleChooseArchive = () => {};
 
   const handleClickOpen = () => {
     // window.scrollTo({
@@ -105,15 +126,13 @@ const JobItem: React.FC<JobItemProps> = ({ job, handleDelete }) => {
           </div>
           <div
             className="bg-indigo-300 hover:bg-indigo-400 active:bg-indigo-500 flex items-center px-1 justify-center  font-extrabold hover:cursor-pointer"
-            onClick={() => {
-              handleSave();
-            }}
+            onClick={handleSave}
           >
             +
           </div>
           <div
             className="bg-indigo-300 hover:bg-indigo-400 active:bg-indigo-500 flex items-center px-1 justify-center  font-extrabold hover:cursor-pointer"
-            onClick={() => {}}
+            onClick={handleChooseArchive}
           >
             @
           </div>

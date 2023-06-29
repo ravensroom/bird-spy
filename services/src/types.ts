@@ -36,3 +36,10 @@ export interface Config {
 export interface User {
   id: string;
 }
+
+export interface Archive {
+  id: string;
+  userId: string;
+  name: string;
+  jobs: Job[];
+}

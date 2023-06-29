@@ -1,63 +1,54 @@
-import React, { FunctionComponentElement, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { Archive } from '../../../types/types';
 import { TrashIcon, PencilSquareIcon } from '@heroicons/react/24/outline';
 import api from '../../../apis/api';
-import ArchiveContainer, { ArchiveContainerProps } from './ArchiveContainer';
+import ArchiveContainer from './ArchiveContainer';
+import { useArchivesContext } from '../../../contexts/ArchivesProvider';
+import { useUserIdContext } from '../../../contexts/UserIdProvider';
+import NavActionButton from './NavActionButton';
+import NavElement from './NavElement';
 
-export interface ConfigTabsProps {
-  defaultIndex?: number;
-  defaultArchive: Archive;
+export interface ArchiveTabsProps {
   className?: string;
-  onSelect?: (selectedIndex: number) => void;
-  children?: React.ReactNode;
 }
 
-const ArchiveTabs: React.FC<ConfigTabsProps> = ({
-  defaultIndex,
-  defaultArchive,
-  onSelect,
-  children,
-  className,
-}) => {
-  const [tabs, setTabs] = useState<React.ReactNode[]>(() =>
-    React.Children.toArray(children)
-  );
-  const [activeIndex, setActiveIndex] = useState(defaultIndex);
-  const [editMode, setEditMode] = useState(false);
+const navbarElementClassnames =
+  'flex items-center text-sm rounded-r-md border-r-2 py-1 cursor-pointer bg-purple-300 bg-opacity-50 hover:bg-purple-100 border-r-slate-400';
 
-  const handleClick = (index: number) => {
+const ArchiveTabs: React.FC<ArchiveTabsProps> = ({ className }) => {
+  const { archives, setArchives } = useArchivesContext();
+  const { userId } = useUserIdContext();
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [editModeIndex, setEditModeIndex] = useState<number | null>(null);
+  const [shouldSaveEdit, setshouldSaveEdit] = useState(false);
+
+  const handleClick = (index: number, archiveJobLength: number) => {
     setActiveIndex(index);
-    if (onSelect) {
-      onSelect(index);
-    }
-  };
-
-  const getDefaultArchive = (): Archive => {
-    return {
-      ...defaultArchive,
-      id: uuidv4(),
-      name: tabs.length > 0 ? 'New Archive' : 'Default',
-      isDefault: tabs.length > 0 ? false : true,
-    };
   };
 
   const handleAddTab = () => {
-    const newArchive = getDefaultArchive();
-    const newTab = (
-      <ArchiveContainer key={newArchive.id} archive={newArchive} />
-    );
-    const newTabs = [...tabs, newTab];
-    setTabs(newTabs);
+    const newArchive = {
+      id: uuidv4(),
+      userId,
+      name: archives.length > 0 ? 'New Archive' : 'Default',
+      isDefault: archives.length > 0 ? false : true,
+      jobs: [],
+    };
 
-    setActiveIndex(newTabs.length - 1);
+    setArchives((prev) => {
+      const updatedArchives = [...prev, newArchive];
+      api.archives.saveArchive(newArchive);
+      localStorage.setItem(
+        `archive-${newArchive.id}`,
+        JSON.stringify(newArchive)
+      );
+      setActiveIndex(updatedArchives.length - 1);
+      return updatedArchives;
+    });
   };
 
   const handleDeleteTab = async (index: number) => {
-    const targetTab = tabs[
-      index
-    ] as FunctionComponentElement<ArchiveContainerProps>;
-    const { archive } = targetTab.props;
+    const archive = archives[index];
     const archiveSaved = (await api.archives.getArchiveById(
       archive.userId,
       archive.id
@@ -66,149 +57,93 @@ const ArchiveTabs: React.FC<ConfigTabsProps> = ({
       : false;
     if (archiveSaved) api.archives.rmArchive(archive.userId, archive.id);
     localStorage.removeItem(`archive-${archive.id}`);
-    const newTabs = [...tabs];
-    newTabs.splice(index, 1);
-    setTabs(newTabs);
 
-    if (index === activeIndex) {
-      // If the active tab is deleted, set the new active index
-      const newActiveIndex = Math.min(index, newTabs.length - 1);
-      setActiveIndex(newActiveIndex);
-    }
-  };
-
-  // const handleDragStart = (
-  //   event: React.DragEvent<HTMLLIElement>,
-  //   index: number
-  // ) => {
-  //   // Store the index of the dragged tab
-  //   event?.dataTransfer?.setData('text/plain', index.toString());
-  // };
-
-  // const handleDragOver = (event: React.DragEvent<HTMLLIElement>) => {
-  //   // Allow dropping on this element
-  //   event.preventDefault();
-  // };
-
-  // const handleDrop = (
-  //   event: React.DragEvent<HTMLLIElement>,
-  //   dropIndex: number
-  // ) => {
-  //   // Get the index of the dragged tab
-  //   const dragIndex = parseInt(event.dataTransfer.getData('text/plain'), 10);
-
-  //   if (!isNaN(dragIndex) && dragIndex !== dropIndex) {
-  //     // Rearrange the tabs by swapping their positions in the array
-  //     const newTabs = [...tabs];
-  //     const draggedTab = newTabs[dragIndex];
-  //     newTabs[dragIndex] = newTabs[dropIndex];
-  //     newTabs[dropIndex] = draggedTab;
-  //     setTabs(newTabs);
-
-  //     // Update the active index to match the dropped tab's new position
-  //     const newActiveIndex = newTabs.findIndex((tab) => tab === draggedTab);
-  //     setActiveIndex(newActiveIndex);
-  //   }
-  // };
-
-  const renderedNavLinks = () => {
-    return tabs.map((tab, index) => {
-      const childElement =
-        tab as FunctionComponentElement<ArchiveContainerProps>;
-      const label = childElement.props.archive.name;
-
-      const handleInputChange = (
-        event: React.ChangeEvent<HTMLInputElement>
-      ) => {
-        const newLabel = event.target.value;
-        const newTabs = [...tabs];
-        //@ts-ignore
-        newTabs[index].props.archive.name = newLabel;
-        setTabs(newTabs);
-      };
-
-      const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-        if (event.key === 'Enter') {
-          setEditMode(false);
-        }
-      };
-
-      return (
-        <li
-          className={`${
-            index === activeIndex ? 'bg-transparent' : ''
-          } flex items-center px-2 py-1 text-sm rounded-r-md cursor-pointer border-r-2 bg-purple-300 bg-opacity-50 border-r-slate-400 hover:bg-purple-100`}
-          key={`nav-item-${index}`}
-          onClick={() => {
-            handleClick(index);
-          }}
-          // draggable
-          // onDragStart={(event) => handleDragStart(event, index)}
-          // onDragOver={handleDragOver}
-          // onDrop={(event) => handleDrop(event, index)}
-        >
-          {editMode && index === activeIndex ? (
-            <input
-              type="text"
-              value={label}
-              onChange={handleInputChange}
-              onKeyDown={handleKeyDown}
-              autoFocus
-              style={{ width: `${Math.max(label.length, 4)}ch` }}
-              className={`h-auto bg-opacity-60 rounded-md bg-white text-sm outline-none`}
-            />
-          ) : (
-            <span>{label}</span>
-          )}
-        </li>
-      );
+    setArchives((prev) => prev.filter((arch) => arch.id !== archive.id));
+    setActiveIndex((prevActiveIndex) => {
+      if (index === prevActiveIndex) {
+        const newActiveIndex = Math.min(index, archives.length - 2);
+        return newActiveIndex;
+      }
+      return prevActiveIndex;
     });
   };
+
+  const handleSaveEdit = (value: string, index: number) => {
+    setEditModeIndex(null);
+    setshouldSaveEdit(false);
+
+    const updatedArchives = archives.map((arch, idx) => {
+      if (index === idx) {
+        const updatedArchive = { ...arch, name: value };
+        api.archives.saveArchive(updatedArchive);
+        localStorage.setItem(
+          `archive-${updatedArchive.id}`,
+          JSON.stringify(updatedArchive)
+        );
+        return updatedArchive;
+      }
+      return arch;
+    });
+
+    setArchives(updatedArchives);
+  };
+
+  const renderedNavLinks = () => {
+    return archives.map((archive, index) => (
+      <NavElement
+        key={archive.id}
+        label={archive.name}
+        saveEdit={(inputValue: string) => handleSaveEdit(inputValue, index)}
+        isActive={index === activeIndex}
+        isDefault={archive.isDefault}
+        editMode={editModeIndex === index}
+        shouldSaveEdit={editModeIndex === index && shouldSaveEdit}
+        onClick={() => handleClick(index, archive.jobs.length)}
+        className={navbarElementClassnames}
+      />
+    ));
+  };
   const renderContent = () => {
-    return tabs.map((tab, index) => {
+    return archives.map((archive, index) => {
       if (index === activeIndex) {
-        return tab;
+        return <ArchiveContainer key={archive.id} archive={archive} />;
       }
     });
   };
   return (
     <div className={className || ''}>
-      <ul className={`flex px-2`}>
+      <ul className={`flex`}>
         <ul className="flex overflow-x-auto">{renderedNavLinks()} </ul>
-
-        <button
+        <NavActionButton
+          className={`${navbarElementClassnames}`}
           onClick={handleAddTab}
-          className="active:text-indigo-800  text-sm rounded-r-md py-1 px-2 cursor-pointer border-r-2 bg-purple-300 bg-opacity-50 border-r-slate-400 hover:bg-purple-100"
-          key="add-tab-button"
         >
           +
-        </button>
-        <li
-          onClick={() => handleDeleteTab(activeIndex || 0)}
-          className={`active:text-indigo-800  flex items-center text-sm rounded-r-md py-1 px-[6px] cursor-pointer border-r-2 bg-purple-300 bg-opacity-50 hover:bg-purple-100 border-r-slate-400 "
-          key="delete-tab-button`}
+        </NavActionButton>
+        <NavActionButton
+          className={`${navbarElementClassnames}`}
+          onClick={() => handleDeleteTab(activeIndex)}
         >
           <TrashIcon className="w-[15px] h-[15px]" />
-        </li>
-        <li
-          onClick={() => {
-            setEditMode(!editMode);
-          }}
+        </NavActionButton>
+        <NavActionButton
           className={`${
-            editMode ? 'text-indigo-800' : ''
-          } flex items-center text-sm rounded-r-md py-1 px-[6px] cursor-pointer border-r-2 bg-purple-300 bg-opacity-50 border-r-slate-400 hover:bg-purple-100`}
-          key="edit-tab-button"
+            typeof editModeIndex === 'number' ? 'text-indigo-800' : ''
+          } ${navbarElementClassnames}`}
+          onClick={() => {
+            if (typeof editModeIndex === 'number') {
+              setshouldSaveEdit(true);
+            } else {
+              if (activeIndex >= 0) setEditModeIndex(activeIndex);
+            }
+          }}
         >
           <PencilSquareIcon className="w-[15px] h-[15px]" />
-        </li>
+        </NavActionButton>
       </ul>
       <div className={`py-1 rounded-sm`}>{renderContent()}</div>
     </div>
   );
-};
-
-ArchiveTabs.defaultProps = {
-  defaultIndex: 0,
 };
 
 export default ArchiveTabs;

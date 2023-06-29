@@ -16,7 +16,7 @@ const getArchives = (userId: string): Promise<Archive[]> => {
 };
 
 const rmArchive = (userId: string, archiveId: string): Promise<void> => {
-  return fetch('http://localhost:3000/api/Archives/rm', {
+  return fetch('http://localhost:3000/api/archives/rm', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -29,7 +29,7 @@ const getArchiveById = (
   userId: string,
   archiveId: string
 ): Promise<Archive | null> => {
-  return fetch('http://localhost:3000/api/Archives/id', {
+  return fetch('http://localhost:3000/api/archives/id', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
