@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { v4 as uuidv4 } from 'uuid';
 import { TrashIcon, PencilSquareIcon } from '@heroicons/react/24/outline';
 import api from '../../../apis/api';
 import ArchiveContainer from './ArchiveContainer';
@@ -7,9 +6,11 @@ import { useArchivesContext } from '../../../contexts/ArchivesProvider';
 import { useUserIdContext } from '../../../contexts/UserIdProvider';
 import NavActionButton from './NavActionButton';
 import NavElement from './NavElement';
+import { Archive } from '../../../types/types';
 
 export interface ArchiveTabsProps {
   className?: string;
+  setActiveTabLength: React.Dispatch<React.SetStateAction<number | null>>;
 }
 
 const navbarElementClassnames =
@@ -22,13 +23,17 @@ const ArchiveTabs: React.FC<ArchiveTabsProps> = ({ className }) => {
   const [editModeIndex, setEditModeIndex] = useState<number | null>(null);
   const [shouldSaveEdit, setshouldSaveEdit] = useState(false);
 
-  const handleClick = (index: number, archiveJobLength: number) => {
+  useEffect(() => {
+    setActiveIndex(activeIndex);
+  }, [activeIndex]);
+
+  const handleClick = (index: number) => {
     setActiveIndex(index);
   };
 
   const handleAddTab = () => {
     const newArchive = {
-      id: uuidv4(),
+      id: `${archives.length}`,
       userId,
       name: archives.length > 0 ? 'New Archive' : 'Default',
       isDefault: archives.length > 0 ? false : true,
@@ -43,22 +48,44 @@ const ArchiveTabs: React.FC<ArchiveTabsProps> = ({ className }) => {
         JSON.stringify(newArchive)
       );
       setActiveIndex(updatedArchives.length - 1);
+      setEditModeIndex(updatedArchives.length - 1);
       return updatedArchives;
     });
   };
 
   const handleDeleteTab = async (index: number) => {
-    const archive = archives[index];
-    const archiveSaved = (await api.archives.getArchiveById(
-      archive.userId,
-      archive.id
-    ))
-      ? true
-      : false;
-    if (archiveSaved) api.archives.rmArchive(archive.userId, archive.id);
+    const archive = archives.find((arch) => +arch.id === index)!;
+    // const archiveSaved = (await api.archives.getArchiveById(
+    //   archive.userId,
+    //   archive.id
+    // ))
+    //   ? true
+    //   : false;
+    api.archives.rmArchive(archive.userId, archive.id);
     localStorage.removeItem(`archive-${archive.id}`);
 
-    setArchives((prev) => prev.filter((arch) => arch.id !== archive.id));
+    setArchives((prev) => {
+      const updatedArchives = prev
+        .filter((arch) => +arch.id !== index)
+        .map((arch) => {
+          if (+arch.id > index) {
+            const newArch: Archive = { ...arch, id: `${+arch.id - 1}` };
+            localStorage.setItem(
+              `archive-${newArch.id}`,
+              JSON.stringify(newArch)
+            );
+            api.archives.saveArchive(newArch);
+            if (+arch.id === archives.length - 1) {
+              api.archives.rmArchive(arch.userId, arch.id);
+              localStorage.removeItem(`archive-${arch.id}`);
+            }
+            return newArch;
+          }
+          return arch;
+        });
+      return updatedArchives;
+    });
+
     setActiveIndex((prevActiveIndex) => {
       if (index === prevActiveIndex) {
         const newActiveIndex = Math.min(index, archives.length - 2);
@@ -72,8 +99,8 @@ const ArchiveTabs: React.FC<ArchiveTabsProps> = ({ className }) => {
     setEditModeIndex(null);
     setshouldSaveEdit(false);
 
-    const updatedArchives = archives.map((arch, idx) => {
-      if (index === idx) {
+    const updatedArchives = archives.map((arch) => {
+      if (index === +arch.id) {
         const updatedArchive = { ...arch, name: value };
         api.archives.saveArchive(updatedArchive);
         localStorage.setItem(
@@ -89,26 +116,30 @@ const ArchiveTabs: React.FC<ArchiveTabsProps> = ({ className }) => {
   };
 
   const renderedNavLinks = () => {
-    return archives.map((archive, index) => (
-      <NavElement
-        key={archive.id}
-        label={archive.name}
-        saveEdit={(inputValue: string) => handleSaveEdit(inputValue, index)}
-        isActive={index === activeIndex}
-        isDefault={archive.isDefault}
-        editMode={editModeIndex === index}
-        shouldSaveEdit={editModeIndex === index && shouldSaveEdit}
-        onClick={() => handleClick(index, archive.jobs.length)}
-        className={navbarElementClassnames}
-      />
-    ));
+    return archives
+      .sort((a1, a2) => +a1.id - +a2.id)
+      .map((archive, index) => (
+        <NavElement
+          key={archive.id}
+          label={archive.name}
+          saveEdit={(inputValue: string) => handleSaveEdit(inputValue, index)}
+          isActive={index === activeIndex}
+          isDefault={archive.isDefault}
+          editMode={editModeIndex === index}
+          shouldSaveEdit={editModeIndex === index && shouldSaveEdit}
+          onClick={() => handleClick(index)}
+          className={navbarElementClassnames}
+        />
+      ));
   };
   const renderContent = () => {
-    return archives.map((archive, index) => {
-      if (index === activeIndex) {
-        return <ArchiveContainer key={archive.id} archive={archive} />;
-      }
-    });
+    return archives
+      .sort((a1, a2) => +a1.id - +a2.id)
+      .map((archive, index) => {
+        if (index === activeIndex) {
+          return <ArchiveContainer key={archive.id} archive={archive} />;
+        }
+      });
   };
   return (
     <div className={className || ''}>

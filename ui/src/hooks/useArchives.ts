@@ -17,7 +17,7 @@ const useArchives = () => {
           if (data.length > 0) setArchives(data);
           else {
             const archive = {
-              id: uuidv4(),
+              id: '0',
               name: 'Default',
               userId,
               isDefault: true,
@@ -25,10 +25,7 @@ const useArchives = () => {
             };
             setArchives([archive]);
             api.archives.saveArchive(archive);
-            localStorage.setItem(
-              `archive-${archive.id}`,
-              JSON.stringify(archive)
-            );
+            localStorage.setItem(`archive-0`, JSON.stringify(archive));
           }
         });
       }

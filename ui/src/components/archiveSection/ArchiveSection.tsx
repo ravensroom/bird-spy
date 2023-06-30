@@ -6,6 +6,7 @@ const ArchiveSection = () => {
   const [folded, setFolded] = useState(true);
   const [loading, setLoading] = useState(true);
   const { archives } = useArchivesContext();
+  const [activeTabLength, setActiveTabLength] = useState<number | null>(null);
 
   useEffect(() => {
     if (archives.length > 0) {
@@ -26,15 +27,19 @@ const ArchiveSection = () => {
           Total saved jobs:{' '}
           {archives.reduce((sum, arc) => sum + arc.jobs.length, 0)}{' '}
         </span>
-        {!folded ? (
+        {!folded && activeTabLength ? (
           <span className="text-gray-900">
             {'&   '}
+            {activeTabLength}
             at current archive
           </span>
         ) : null}
       </div>
       {!loading ? (
-        <ArchiveTabs className={`${folded ? 'hidden' : ''}`} />
+        <ArchiveTabs
+          className={`${folded ? 'hidden' : ''}`}
+          setActiveTabLength={setActiveTabLength}
+        />
       ) : null}
     </div>
   );
