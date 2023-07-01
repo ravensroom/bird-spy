@@ -4,8 +4,8 @@ import api from '../../../apis/api';
 import ArchiveContainer from './ArchiveContainer';
 import { useArchivesContext } from '../../../contexts/ArchivesProvider';
 import { useUserIdContext } from '../../../contexts/UserIdProvider';
-import NavActionButton from './NavActionButton';
-import NavElement from './NavElement';
+import NavActionButton from '../../public/NavActionButton';
+import NavElement from '../../public/NavElement';
 import { Archive } from '../../../types/types';
 
 export interface ArchiveTabsProps {
@@ -16,7 +16,10 @@ export interface ArchiveTabsProps {
 const navbarElementClassnames =
   'flex items-center text-sm rounded-r-md border-r-2 py-1 cursor-pointer bg-purple-300 bg-opacity-50 hover:bg-purple-100 border-r-slate-400';
 
-const ArchiveTabs: React.FC<ArchiveTabsProps> = ({ className }) => {
+const ArchiveTabs: React.FC<ArchiveTabsProps> = ({
+  className,
+  setActiveTabLength,
+}) => {
   const { archives, setArchives } = useArchivesContext();
   const { userId } = useUserIdContext();
   const [activeIndex, setActiveIndex] = useState(0);
@@ -24,7 +27,8 @@ const ArchiveTabs: React.FC<ArchiveTabsProps> = ({ className }) => {
   const [shouldSaveEdit, setshouldSaveEdit] = useState(false);
 
   useEffect(() => {
-    setActiveIndex(activeIndex);
+    const activeTab = archives.find((arch) => +arch.id === activeIndex)!;
+    setActiveTabLength(activeTab.jobs.length);
   }, [activeIndex]);
 
   const handleClick = (index: number) => {
@@ -35,8 +39,7 @@ const ArchiveTabs: React.FC<ArchiveTabsProps> = ({ className }) => {
     const newArchive = {
       id: `${archives.length}`,
       userId,
-      name: archives.length > 0 ? 'New Archive' : 'Default',
-      isDefault: archives.length > 0 ? false : true,
+      name: archives.length > 0 ? 'New Archive' : 'Saved',
       jobs: [],
     };
 
@@ -54,6 +57,7 @@ const ArchiveTabs: React.FC<ArchiveTabsProps> = ({ className }) => {
   };
 
   const handleDeleteTab = async (index: number) => {
+    if (archives.length === 1) return
     const archive = archives.find((arch) => +arch.id === index)!;
     // const archiveSaved = (await api.archives.getArchiveById(
     //   archive.userId,
@@ -83,6 +87,13 @@ const ArchiveTabs: React.FC<ArchiveTabsProps> = ({ className }) => {
           }
           return arch;
         });
+      setActiveIndex((prevActiveIndex) => {
+        if (index === prevActiveIndex) {
+          const newActiveIndex = Math.min(index, updatedArchives.length - 1);
+          return newActiveIndex;
+        }
+        return prevActiveIndex;
+      });
       return updatedArchives;
     });
 
@@ -124,7 +135,6 @@ const ArchiveTabs: React.FC<ArchiveTabsProps> = ({ className }) => {
           label={archive.name}
           saveEdit={(inputValue: string) => handleSaveEdit(inputValue, index)}
           isActive={index === activeIndex}
-          isDefault={archive.isDefault}
           editMode={editModeIndex === index}
           shouldSaveEdit={editModeIndex === index && shouldSaveEdit}
           onClick={() => handleClick(index)}

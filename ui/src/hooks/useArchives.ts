@@ -18,9 +18,8 @@ const useArchives = () => {
           else {
             const archive = {
               id: '0',
-              name: 'Default',
+              name: 'Saved',
               userId,
-              isDefault: true,
               jobs: [] as Job[],
             };
             setArchives([archive]);

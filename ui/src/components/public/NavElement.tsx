@@ -5,7 +5,6 @@ interface NavElementProps {
   saveEdit: (inputValue: string) => void;
   onClick: () => void;
   isActive: boolean;
-  isDefault: boolean;
   editMode: boolean;
   shouldSaveEdit: boolean;
   className?: string;
@@ -15,7 +14,6 @@ const NavElement: React.FC<NavElementProps> = ({
   label,
   saveEdit,
   isActive,
-  isDefault,
   editMode,
   onClick,
   shouldSaveEdit,
@@ -46,8 +44,7 @@ const NavElement: React.FC<NavElementProps> = ({
   return (
     <li
       onClick={onClick}
-      className={`${isActive ? 'bg-transparent' : ''} ${className} px-2 ${
-        isDefault ? 'font-bold text-gray-800' : ''
+      className={`${isActive ? 'bg-transparent' : ''} ${className} px-2
       }`}
     >
       {editMode && isActive ? (

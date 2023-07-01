@@ -25,12 +25,11 @@ const locationHolder = 'united states';
 const timeRangeHolder = 'by day';
 
 export interface ConfigEditorProps {
-  id: string;
   config: Config;
 }
 
-const ConfigEditor: React.FC<ConfigEditorProps> = ({ id, config }) => {
-  const localData = localStorage.getItem(`config-${id}`);
+const ConfigEditor: React.FC<ConfigEditorProps> = ({ config }) => {
+  const localData = localStorage.getItem(`config-${config.id}`);
   const localConfigBody: ConfigBody | null = localData
     ? JSON.parse(localData).body
     : null;
@@ -81,7 +80,6 @@ const ConfigEditor: React.FC<ConfigEditorProps> = ({ id, config }) => {
     }
 
     if (listOfSearchKeywords.data.length === 0) {
-      // clear fetchIntervals or all
       setHeaderMessage('Please enter queries!');
       setTimeout(() => setHeaderMessage(''), 3000);
       return;
@@ -92,7 +90,7 @@ const ConfigEditor: React.FC<ConfigEditorProps> = ({ id, config }) => {
 
     const configBody = form.getConfigBody();
     const configData = {
-      id,
+      id: config.id,
       name: config.name,
       userId,
       body: configBody,
@@ -133,7 +131,7 @@ const ConfigEditor: React.FC<ConfigEditorProps> = ({ id, config }) => {
     }
     const configBody = form.getConfigBody();
     const configData = {
-      id,
+      id: config.id,
       name: config.name,
       userId,
       body: configBody,
@@ -141,7 +139,7 @@ const ConfigEditor: React.FC<ConfigEditorProps> = ({ id, config }) => {
     api.configs
       .saveConfig(configData)
       .then(() => {
-        localStorage.setItem(`config-${id}`, JSON.stringify(configData));
+        localStorage.setItem(`config-${config.id}`, JSON.stringify(configData));
         setHeaderMessage('Search config saved!');
         setTimeout(() => setHeaderMessage(''), 3000);
       })

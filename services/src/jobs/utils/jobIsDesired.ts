@@ -3,7 +3,7 @@ export function jobIsDesired(
   titleExcludes: string[],
   title: string
 ): boolean {
-  const titleWords = title.split(/[\s(),.;\-|\/]+/);
+  const titleWords = title.toLowerCase().split(/[\s(),.;\-|\/]+/);
 
   for (let word of titleWords) {
     word = word.toLowerCase();

@@ -23,14 +23,15 @@ const ArchiveSection = () => {
         }}
         className="px-2 py-1 border-purple-300 text-gray-600 text-xs cursor-pointer"
       >
-        <span>
-          Total saved jobs:{' '}
-          {archives.reduce((sum, arc) => sum + arc.jobs.length, 0)}{' '}
-        </span>
-        {!folded && activeTabLength ? (
+        {archives ? (
+          <span>
+            Total saved jobs:{' '}
+            {archives.reduce((sum, arc) => sum + arc.jobs.length, 0)}{' '}
+          </span>
+        ) : null}
+        {!folded && typeof activeTabLength === 'number' ? (
           <span className="text-gray-900">
-            {'&   '}
-            {activeTabLength}
+            {`&   ${activeTabLength} `}
             at current archive
           </span>
         ) : null}

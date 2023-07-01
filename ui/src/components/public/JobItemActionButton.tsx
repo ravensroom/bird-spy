@@ -15,7 +15,7 @@ const JobItemActionButton: React.FC<JobItemActionButtonProps> = ({
 }) => {
   return (
     <div
-      className={`bg-indigo-300 hover:bg-indigo-400 active:bg-indigo-500 flex items-center px-1 justify-center font-extrabold hover:cursor-pointer ${className}`}
+      className={`flex items-center px-1 justify-center font-extrabold hover:cursor-pointer ${className}`}
       onClick={onClick}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}

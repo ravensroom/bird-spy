@@ -113,6 +113,7 @@ const JobItem: React.FC<JobItemProps> = ({
 
         <div className="flex flex-col text-sm h-full ml-1 bg-opacity-40 text-gray-700">
           <JobItemActionButton
+            className="bg-indigo-300 hover:bg-indigo-400 active:bg-indigo-500"
             onClick={() => {
               handleDelete(job.id);
             }}
@@ -127,7 +128,7 @@ const JobItem: React.FC<JobItemProps> = ({
             +
           </JobItemActionButton> */}
           <JobItemActionButton
-            className="relative bg-purple-300"
+            className="relative bg-purple-300 hover:bg-purple-400 active:bg-purple-500"
             onMouseEnter={handleMenuOpen}
             onMouseLeave={handleMenuClose}
             onClick={(event: React.MouseEvent) => event.stopPropagation()}

@@ -41,6 +41,5 @@ export interface Archive {
   id: string;
   userId: string;
   name: string;
-  isDefault: boolean;
   jobs: Job[];
 }

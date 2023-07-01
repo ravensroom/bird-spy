@@ -1,213 +1,216 @@
-import React, { FunctionComponentElement, useState } from 'react';
-import ConfigEditor, { ConfigEditorProps } from './ConfigEditor';
-import { v4 as uuidv4 } from 'uuid';
+import React, { useEffect, useState } from 'react';
+import ConfigEditor from './ConfigEditor';
 import { Config } from '../../../types/types';
 import { TrashIcon, PencilSquareIcon } from '@heroicons/react/24/outline';
 import api from '../../../apis/api';
+import { useUserIdContext } from '../../../contexts/UserIdProvider';
+import NavElement from '../../public/NavElement';
+import NavActionButton from '../../public/NavActionButton';
+
+const navbarElementClassnames =
+  'flex items-center text-sm rounded-r-md border-r-2 py-1 cursor-pointer bg-pink-200 bg-opacity-50 hover:bg-pink-100 border-r-slate-300';
 
 export interface ConfigTabsProps {
-  defaultIndex?: number;
-  defaultConfig: Config;
-  onSelect?: (selectedIndex: number) => void;
-  children?: React.ReactNode;
+  configs: Config[];
 }
 
-const ConfigTabs: React.FC<ConfigTabsProps> = ({
-  defaultConfig,
-  defaultIndex,
-  onSelect,
-  children,
-}) => {
-  const [tabs, setTabs] = useState<React.ReactNode[]>(() =>
-    React.Children.toArray(children)
+const ConfigTabs: React.FC<ConfigTabsProps> = ({ configs }) => {
+  const [tabConfigs, setTabConfigs] = useState(
+    configs.sort((c1, c2) => +c1.id - +c2.id)
   );
-  const [activeIndex, setActiveIndex] = useState(defaultIndex);
-  const [editMode, setEditMode] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [editModeIndex, setEditModeIndex] = useState<number | null>(null);
+  const [shouldSaveEdit, setshouldSaveEdit] = useState(false);
+  const { userId } = useUserIdContext();
 
-  const getDefaultConfig = () => {
+  const getConfigTemplate = () => {
     return {
-      ...defaultConfig,
-      id: uuidv4(),
-    };
+      id: '',
+      name: 'New Search',
+      userId,
+      body: {
+        location: 'united states',
+        timeRange: 'by day',
+        listOfSearchKeywords: ['software engineer'],
+        titleIncludes: ['junior'],
+        titleExcludes: ['senior'],
+        priorityList: { citizen: -100 },
+      },
+    } as Config;
   };
 
   const handleClick = (index: number) => {
     setActiveIndex(index);
-    if (onSelect) {
-      onSelect(index);
-    }
   };
 
   const handleAddTab = () => {
-    const newDefaultConfig = getDefaultConfig();
-    const newTab = (
-      <ConfigEditor
-        key={newDefaultConfig.id}
-        id={newDefaultConfig.id}
-        config={newDefaultConfig}
-      />
-    );
-    const newTabs = [...tabs, newTab];
-    setTabs(newTabs);
-
-    setActiveIndex(newTabs.length - 1);
+    const newConfig = getConfigTemplate();
+    newConfig.id = `${tabConfigs.length}`;
+    setTabConfigs((prev) => {
+      const newConfigs = [...prev, newConfig];
+      setActiveIndex(newConfigs.length - 1);
+      setEditModeIndex(newConfigs.length - 1);
+      return newConfigs;
+    });
+    localStorage.setItem(`config-${newConfig.id}`, JSON.stringify(newConfig));
+    api.configs.saveConfig(newConfig);
   };
 
   const handleDeleteTab = async (index: number) => {
-    const targetTab = tabs[
-      index
-    ] as FunctionComponentElement<ConfigEditorProps>;
-    const { config } = targetTab.props;
-    const configSaved = (await api.configs.getConfigById(
-      config.userId,
-      config.id
-    ))
-      ? true
-      : false;
-    if (configSaved) api.configs.rmConfig(config.userId, config.id);
+    if (tabConfigs.length === 1) return;
+    const config = tabConfigs[index];
+    // const configSaved = (await api.configs.getConfigById(
+    //   config.userId,
+    //   config.id
+    // ))
+    //   ? true
+    //   : false;
+    // if (configSaved)
+    api.configs.rmConfig(config.userId, config.id);
     localStorage.removeItem(`config-${config.id}`);
-    const newTabs = [...tabs];
-    newTabs.splice(index, 1);
-    setTabs(newTabs);
-
-    if (index === activeIndex) {
-      // If the active tab is deleted, set the new active index
-      const newActiveIndex = Math.min(index, newTabs.length - 1);
-      setActiveIndex(newActiveIndex);
-    }
-  };
-
-  const handleDragStart = (
-    event: React.DragEvent<HTMLLIElement>,
-    index: number
-  ) => {
-    // Store the index of the dragged tab
-    event?.dataTransfer?.setData('text/plain', index.toString());
-  };
-
-  const handleDragOver = (event: React.DragEvent<HTMLLIElement>) => {
-    // Allow dropping on this element
-    event.preventDefault();
-  };
-
-  const handleDrop = (
-    event: React.DragEvent<HTMLLIElement>,
-    dropIndex: number
-  ) => {
-    // Get the index of the dragged tab
-    const dragIndex = parseInt(event.dataTransfer.getData('text/plain'), 10);
-
-    if (!isNaN(dragIndex) && dragIndex !== dropIndex) {
-      // Rearrange the tabs by swapping their positions in the array
-      const newTabs = [...tabs];
-      const draggedTab = newTabs[dragIndex];
-      newTabs[dragIndex] = newTabs[dropIndex];
-      newTabs[dropIndex] = draggedTab;
-      setTabs(newTabs);
-
-      // Update the active index to match the dropped tab's new position
-      const newActiveIndex = newTabs.findIndex((tab) => tab === draggedTab);
-      setActiveIndex(newActiveIndex);
-    }
-  };
-
-  const renderedNavLinks = () => {
-    return tabs.map((tab, index) => {
-      const childElement = tab as FunctionComponentElement<ConfigEditorProps>;
-      const label = childElement.props.config.name;
-
-      const handleInputChange = (
-        event: React.ChangeEvent<HTMLInputElement>
-      ) => {
-        const newLabel = event.target.value;
-        const newTabs = [...tabs];
-        //@ts-ignore
-        newTabs[index].props.config.name = newLabel;
-        setTabs(newTabs);
-      };
-
-      const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-        if (event.key === 'Enter') {
-          setEditMode(false);
+    setTabConfigs((prev) => {
+      const updatedConfigs = prev
+        .filter((config) => +config.id !== index)
+        .map((config) => {
+          if (+config.id > index) {
+            const newConfig: Config = { ...config, id: `${+config.id - 1}` };
+            localStorage.setItem(
+              `config-${newConfig.id}`,
+              JSON.stringify(newConfig)
+            );
+            api.configs.saveConfig(newConfig);
+            if (+config.id === configs.length - 1) {
+              api.configs.rmConfig(config.userId, config.id);
+              localStorage.removeItem(`config-${config.id}`);
+            }
+            return newConfig;
+          }
+          return config;
+        });
+      setActiveIndex((prevActiveIndex) => {
+        if (index === prevActiveIndex) {
+          const newActiveIndex = Math.min(index, updatedConfigs.length - 1);
+          return newActiveIndex;
         }
-      };
-
-      return (
-        <li
-          className={`${
-            index === activeIndex ? 'bg-transparent' : ''
-          } flex items-center px-2 py-1 text-sm rounded-r-md cursor-pointer border-r-2 bg-pink-200 bg-opacity-50 border-r-slate-300 hover:bg-pink-100`}
-          key={`nav-item-${index}`}
-          onClick={() => {
-            handleClick(index);
-          }}
-          draggable
-          onDragStart={(event) => handleDragStart(event, index)}
-          onDragOver={handleDragOver}
-          onDrop={(event) => handleDrop(event, index)}
-        >
-          {editMode && index === activeIndex ? (
-            <input
-              type="text"
-              value={label}
-              onChange={handleInputChange}
-              onKeyDown={handleKeyDown}
-              autoFocus
-              style={{ width: `${Math.max(label.length, 4)}ch` }}
-              className={`h-auto bg-opacity-60 rounded-md bg-white text-sm outline-none`}
-            />
-          ) : (
-            <span>{label}</span>
-          )}
-        </li>
-      );
+        return prevActiveIndex;
+      });
+      return updatedConfigs;
     });
   };
-  const renderContent = () => {
-    return tabs.map((tab, index) => {
+
+  const handleSaveEdit = (value: string, index: number) => {
+    setEditModeIndex(null);
+    setshouldSaveEdit(false);
+
+    const updatedConfigs = tabConfigs.map((conf) => {
+      if (index === +conf.id) {
+        const updatedConfig = { ...conf, name: value };
+        api.configs.saveConfig(updatedConfig);
+        localStorage.setItem(
+          `config-${updatedConfig.id}`,
+          JSON.stringify(updatedConfig)
+        );
+        return updatedConfig;
+      }
+      return conf;
+    });
+
+    setTabConfigs(updatedConfigs);
+  };
+
+  // const handleDragStart = (
+  //   event: React.DragEvent<HTMLLIElement>,
+  //   index: number
+  // ) => {
+  //   // Store the index of the dragged tab
+  //   event?.dataTransfer?.setData('text/plain', index.toString());
+  // };
+
+  // const handleDragOver = (event: React.DragEvent<HTMLLIElement>) => {
+  //   // Allow dropping on this element
+  //   event.preventDefault();
+  // };
+
+  // const handleDrop = (
+  //   event: React.DragEvent<HTMLLIElement>,
+  //   dropIndex: number
+  // ) => {
+  //   // Get the index of the dragged tab
+  //   const dragIndex = parseInt(event.dataTransfer.getData('text/plain'), 10);
+
+  //   if (!isNaN(dragIndex) && dragIndex !== dropIndex) {
+  //     // Rearrange the tabs by swapping their positions in the array
+
+  //     setTabConfigs((prev) => {
+  //       const newTabConfigs = [...prev];
+  //       const draggedTab = newTabConfigs[dragIndex];
+  //       newTabConfigs[dragIndex] = newTabConfigs[dropIndex];
+  //       newTabConfigs[dropIndex] = draggedTab;
+  //       setActiveIndex(
+  //         newTabConfigs.findIndex((config) => config.id === draggedTab.id)
+  //       );
+  //       return newTabConfigs;
+  //     });
+  //   }
+  // };
+
+  const renderedNavLinks = () => {
+    return tabConfigs.map((config, index) => (
+      <NavElement
+        key={config.id}
+        label={config.name}
+        saveEdit={(inputValue: string) => handleSaveEdit(inputValue, index)}
+        isActive={index === activeIndex}
+        editMode={editModeIndex === index}
+        shouldSaveEdit={editModeIndex === index && shouldSaveEdit}
+        onClick={() => handleClick(index)}
+        className={navbarElementClassnames}
+      />
+    ));
+  };
+
+  const renderedContent = () => {
+    return tabConfigs.map((config, index) => {
       if (index === activeIndex) {
-        return tab;
+        return <ConfigEditor key={config.id} config={config} />;
       }
     });
   };
+
   return (
     <div className={``}>
       <ul className={`flex mx-2 `}>
         <ul className="flex overflow-x-auto">{renderedNavLinks()} </ul>
-
-        <button
+        <NavActionButton
+          className={`${navbarElementClassnames}`}
           onClick={handleAddTab}
-          className="active:text-indigo-800 transition-all text-sm rounded-r-md py-1 px-2 cursor-pointer border-r-2 bg-pink-200 bg-opacity-50 border-r-slate-300 hover:bg-pink-100"
-          key="add-tab-button"
         >
           +
-        </button>
-        <li
-          onClick={() => handleDeleteTab(activeIndex || 0)}
-          className={`active:text-indigo-800  flex items-center text-sm rounded-r-md py-1 px-[6px] cursor-pointer border-r-2 bg-pink-200 bg-opacity-50 border-r-slate-300 hover:bg-pink-100"
-          key="delete-tab-button`}
+        </NavActionButton>
+        <NavActionButton
+          className={`${navbarElementClassnames}`}
+          onClick={() => handleDeleteTab(activeIndex)}
         >
           <TrashIcon className="w-[15px] h-[15px]" />
-        </li>
-        <li
-          onClick={() => {
-            setEditMode(!editMode);
-          }}
+        </NavActionButton>
+        <NavActionButton
           className={`${
-            editMode ? 'text-indigo-800' : ''
-          } flex items-center text-sm rounded-r-md py-1 px-[6px] cursor-pointer border-r-2 bg-pink-200 bg-opacity-50 border-r-slate-300 hover:bg-pink-100`}
-          key="edit-tab-button"
+            typeof editModeIndex === 'number' ? 'text-indigo-800' : ''
+          } ${navbarElementClassnames}`}
+          onClick={() => {
+            if (typeof editModeIndex === 'number') {
+              setshouldSaveEdit(true);
+            } else {
+              if (activeIndex >= 0) setEditModeIndex(activeIndex);
+            }
+          }}
         >
           <PencilSquareIcon className="w-[15px] h-[15px]" />
-        </li>
+        </NavActionButton>
       </ul>
-      <div className={`p-2 rounded-sm`}>{renderContent()}</div>
+      <div className={`p-2 rounded-sm`}>{renderedContent()}</div>
     </div>
   );
-};
-
-ConfigTabs.defaultProps = {
-  defaultIndex: 0,
 };
 
 export default ConfigTabs;

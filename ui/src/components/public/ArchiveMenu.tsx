@@ -15,8 +15,12 @@ const ArchiveMenu: React.FC<ArchiveMenuProps> = ({ job, handleDelete }) => {
   const handleAddToArchive = (job: Job, arch: Archive) => {
     if (
       arch.jobs.find((jobInArchive) => jobInArchive.id === job.id) !== undefined
-    )
+    ) {
+      setHeaderMessage(`Job exists!`);
+      setTimeout(() => setHeaderMessage(''), 3000);
+
       return;
+    }
     setArchives((prev) => {
       const archive = prev.find((arc) => arc.id === arch.id)!;
       archive.jobs.push(job);
@@ -29,15 +33,13 @@ const ArchiveMenu: React.FC<ArchiveMenuProps> = ({ job, handleDelete }) => {
     });
 
     handleDelete(job.id);
-    const headerMessage = arch.isDefault
-      ? `Saved to default archive!`
-      : `Saved to archive <${arch.name}>!`;
+    const headerMessage = `Saved to archive <${arch.name}>!`;
     setHeaderMessage(headerMessage);
     setTimeout(() => setHeaderMessage(''), 3000);
   };
 
   return (
-    <ul className="z-[999] absolute left-[-98px] w-24 top-0 shadow-sm shadow-purple-400">
+    <ul className="z-[999] absolute left-[-96px] w-24 top-[-21px] shadow-sm shadow-purple-400">
       {archives.map((arch, index) => (
         <li
           onClick={() => handleAddToArchive(job, arch)}
@@ -46,7 +48,7 @@ const ArchiveMenu: React.FC<ArchiveMenuProps> = ({ job, handleDelete }) => {
             index % 2 === 0
               ? 'bg-purple-100 hover:bg-purple-200'
               : 'bg-indigo-100 hover:bg-indigo-200'
-          } py-1 pl-2 text-xs `}
+          } py-1 px-2 text-xs `}
         >
           {arch.name}
         </li>
