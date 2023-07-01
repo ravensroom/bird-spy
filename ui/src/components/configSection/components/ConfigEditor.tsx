@@ -9,7 +9,7 @@ import {
 import Input from './Input';
 import useDataList from '../hooks/useDataList';
 import ActionButton from './ActionButton';
-import { useSaveMessageContext } from '../../../contexts/SaveMessageProvider';
+import { useHeaderMessageContext } from '../../../contexts/SaveMessageProvider';
 import { useSearchResultsContext } from '../../../contexts/SearchResultsProvider';
 import { useUserIdContext } from '../../../contexts/UserIdProvider';
 import api from '../../../apis/api';
@@ -66,7 +66,7 @@ const ConfigEditor: React.FC<ConfigEditorProps> = ({ id, config }) => {
     location,
     timeRange,
   ]);
-  const { setHeaderMessage } = useSaveMessageContext();
+  const { setHeaderMessage } = useHeaderMessageContext();
   const { setResults } = useSearchResultsContext();
   const { userId } = useUserIdContext();
   const [isSearching, setIsSearching] = useState(false);
@@ -142,7 +142,7 @@ const ConfigEditor: React.FC<ConfigEditorProps> = ({ id, config }) => {
       .saveConfig(configData)
       .then(() => {
         localStorage.setItem(`config-${id}`, JSON.stringify(configData));
-        setHeaderMessage('Successfully saved!');
+        setHeaderMessage('Search config saved!');
         setTimeout(() => setHeaderMessage(''), 3000);
       })
       .catch(() => {

@@ -1,4 +1,4 @@
-import { SaveMessageProvider } from './SaveMessageProvider';
+import { HeaderMessageProvider } from './SaveMessageProvider';
 import { SearchResultsProvider } from './SearchResultsProvider';
 import { UserIdProvider } from './UserIdProvider';
 import { ArchivesProvider } from './ArchivesProvider';
@@ -14,7 +14,7 @@ const AppContextProvider: React.FC<AppContextProviderProps> = ({
     <UserIdProvider>
       <ArchivesProvider>
         <SearchResultsProvider>
-          <SaveMessageProvider>{children}</SaveMessageProvider>
+          <HeaderMessageProvider>{children}</HeaderMessageProvider>
         </SearchResultsProvider>
       </ArchivesProvider>
     </UserIdProvider>

@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { useSaveMessageContext } from '../../contexts/SaveMessageProvider';
+import { useHeaderMessageContext } from '../../contexts/SaveMessageProvider';
 
 const Header = () => {
-  const { headerMessage } = useSaveMessageContext();
+  const { headerMessage } = useHeaderMessageContext();
   const [isBirdNinga, setIsBirdNinga] = useState(true);
   const handleHeaderClick = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -39,7 +39,7 @@ const Header = () => {
         <span>BirdSpy</span>
       </div>
       {headerMessage && (
-        <div className="p-1 rounded-md bg-pink-400 bg-opacity-80 text-xs text-white font-bold">
+        <div className="p-1 rounded-md bg-pink-400  text-xs text-white font-bold">
           {headerMessage}
         </div>
       )}

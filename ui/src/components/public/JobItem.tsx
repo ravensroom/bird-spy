@@ -2,13 +2,21 @@ import { useState, useRef, useEffect } from 'react';
 import { Job } from '../../types/types';
 import api from '../../apis/api';
 import { useArchivesContext } from '../../contexts/ArchivesProvider';
+import ArchiveMenu from './ArchiveMenu';
+import { useHeaderMessageContext } from '../../contexts/SaveMessageProvider';
+import JobItemActionButton from './JobItemActionButton';
 
 interface JobItemProps {
   job: Job;
   handleDelete: (id: string) => void;
+  // handleAddButton: (id: string) => void;
 }
 
-const JobItem: React.FC<JobItemProps> = ({ job, handleDelete }) => {
+const JobItem: React.FC<JobItemProps> = ({
+  job,
+  handleDelete,
+  //handleAddButton,
+}) => {
   const {
     title,
     company,
@@ -19,10 +27,10 @@ const JobItem: React.FC<JobItemProps> = ({ job, handleDelete }) => {
     priorityHits,
   } = job.body;
   const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [menuVisible, setMenuVisible] = useState(false);
   const headerRef = useRef<HTMLDivElement>(null);
   // const [headerOffsetTop, setHeaderOffsetTop] = useState(0);
   const [isViewd, setIsViewd] = useState<boolean>(false);
-  const { archives, setArchives } = useArchivesContext();
 
   // useEffect(() => {
   //   if (isOpen) return;
@@ -43,25 +51,13 @@ const JobItem: React.FC<JobItemProps> = ({ job, handleDelete }) => {
   //   };
   // }, [headerRef.current?.offsetTop, isOpen]);
 
-  const handleSave = () => {
-    setArchives((prev) => {
-      const defaultArchive = prev.filter((arch) => arch.isDefault)[0];
-      defaultArchive.jobs.push(job);
-      localStorage.setItem(
-        `archive-${defaultArchive.id}`,
-        JSON.stringify(defaultArchive)
-      );
-      api.archives.saveArchive(defaultArchive);
-      return prev.map((arch) => {
-        if (arch.id === defaultArchive.id) return { ...defaultArchive };
-        return arch;
-      });
-    });
-
-    handleDelete(job.id);
+  const handleMenuOpen = () => {
+    setMenuVisible(true);
   };
 
-  const handleChooseArchive = () => {};
+  const handleMenuClose = () => {
+    setMenuVisible(false);
+  };
 
   const handleClickOpen = () => {
     // window.scrollTo({
@@ -116,26 +112,31 @@ const JobItem: React.FC<JobItemProps> = ({ job, handleDelete }) => {
         </div>
 
         <div className="flex flex-col text-sm h-full ml-1 bg-opacity-40 text-gray-700">
-          <div
-            className="bg-indigo-300 hover:bg-indigo-400 active:bg-indigo-500 flex items-center px-1 justify-center  font-extrabold hover:cursor-pointer"
+          <JobItemActionButton
             onClick={() => {
               handleDelete(job.id);
             }}
           >
             x
-          </div>
-          <div
-            className="bg-indigo-300 hover:bg-indigo-400 active:bg-indigo-500 flex items-center px-1 justify-center  font-extrabold hover:cursor-pointer"
-            onClick={handleSave}
+          </JobItemActionButton>
+          {/* <JobItemActionButton
+            onClick={() => {
+              handleAddButton(job.id);
+            }}
           >
             +
-          </div>
-          <div
-            className="bg-indigo-300 hover:bg-indigo-400 active:bg-indigo-500 flex items-center px-1 justify-center  font-extrabold hover:cursor-pointer"
-            onClick={handleChooseArchive}
+          </JobItemActionButton> */}
+          <JobItemActionButton
+            className="relative bg-purple-300"
+            onMouseEnter={handleMenuOpen}
+            onMouseLeave={handleMenuClose}
+            onClick={(event: React.MouseEvent) => event.stopPropagation()}
           >
-            @
-          </div>
+            +
+            {menuVisible && (
+              <ArchiveMenu job={job} handleDelete={handleDelete} />
+            )}
+          </JobItemActionButton>
         </div>
       </div>
       {/* Job descrption */}

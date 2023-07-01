@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState } from 'react';
 
-interface SaveMessageProviderProps {
+interface HeaderMessageProviderProps {
   children: React.ReactNode;
 }
 
@@ -13,7 +13,7 @@ export const HeaderMessageContext = createContext<
   IHeaderMessageContext | undefined
 >(undefined);
 
-export const useSaveMessageContext = () => {
+export const useHeaderMessageContext = () => {
   const context = useContext(HeaderMessageContext);
   if (!context) {
     throw new Error(
@@ -23,7 +23,7 @@ export const useSaveMessageContext = () => {
   return context;
 };
 
-const SaveMessageProvider: React.FC<SaveMessageProviderProps> = ({
+const HeaderMessageProvider: React.FC<HeaderMessageProviderProps> = ({
   children,
 }) => {
   const [headerMessage, setHeaderMessage] = useState('');
@@ -35,4 +35,4 @@ const SaveMessageProvider: React.FC<SaveMessageProviderProps> = ({
   );
 };
 
-export { SaveMessageProvider };
+export { HeaderMessageProvider };

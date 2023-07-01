@@ -23,6 +23,10 @@ const NavElement: React.FC<NavElementProps> = ({
 }) => {
   const [inputValue, setInputValue] = useState(label);
 
+  useEffect(() => {
+    setInputValue(label);
+  }, [label]);
+
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(event.target.value);
   };
@@ -43,7 +47,7 @@ const NavElement: React.FC<NavElementProps> = ({
     <li
       onClick={onClick}
       className={`${isActive ? 'bg-transparent' : ''} ${className} px-2 ${
-        isDefault ? '' : ''
+        isDefault ? 'font-bold text-gray-800' : ''
       }`}
     >
       {editMode && isActive ? (
