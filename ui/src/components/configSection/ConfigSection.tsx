@@ -44,7 +44,7 @@ const ConfigSection = () => {
   }, [userId]);
 
   return (
-    <div className="sm:mx-8 md:mx-16 lg:mx-24 rounded-md pt-8 mb-2 border-2 border-pink-500 border-opacity-50 border-t-0">
+    <div className="sm:mx-8 md:mx-16 lg:mx-24 rounded-md pt-9 mb-2 border-2 border-pink-500 border-opacity-50 border-t-0">
       {!loading && configs ? <ConfigTabs configs={configs} /> : null}
     </div>
   );
