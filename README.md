@@ -1,14 +1,10 @@
-# >>>> bird spy <<<<
+# birdSpy
 
-Customizable job board scraper.
+Simple, lovely job board.
 
-Currently implemented for linkedIn,
-, with options to scrape job posts from with 24 hours or a week
-, highly flexible title filter by inclusion and exclusion
+The data comes from scrapers. 
+A lot of flexibility in filtering rules and the filters work.
+Search results are updated real-time as scraper runs and you can save interesting items to customized archives.
+Search rules and jobs you save are kept in localStorage if you don't want to log in. However, search results do not persist by design.
 
-Planning to
-, add more job sites...
-, search through each job description and designate priority by preferences
-, consider database or UI options
-
-To be solved: 429 bad request
+At this point, it works almost just fine functionality-wise for a single user which is me. But a lot more needs to be done. Also, the source is still limited to Linkedin.
