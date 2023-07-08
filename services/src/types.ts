@@ -35,6 +35,10 @@ export interface Config {
 
 export interface User {
   id: string;
+  email?: string;
+  password?: string;
+  googleId?: string;
+  githubId?: string;
 }
 
 export interface Archive {

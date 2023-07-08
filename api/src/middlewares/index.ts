@@ -13,4 +13,14 @@ const enableCORS = (req: Request, res: Response, next: NextFunction) => {
   next();
 };
 
-export { enableCORS };
+const handleErrors = (
+  err: Error,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  console.error(err);
+  res.status(500).json({ error: 'Internal Server Error' });
+};
+
+export { enableCORS, handleErrors };

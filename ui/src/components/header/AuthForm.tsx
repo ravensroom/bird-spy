@@ -2,6 +2,10 @@ import { useCallback, useState } from 'react';
 import ReactDOM from 'react-dom';
 import { BsGithub, BsGoogle } from 'react-icons/bs';
 import AuthSocialButton from './AuthSocialButton';
+import api from '../../apis/api';
+import { useHeaderMessageContext } from '../../contexts/SaveMessageProvider';
+import { useUserIdContext } from '../../contexts/UserIdProvider';
+import { User } from '../../types/types';
 
 type Variant = 'LOGIN' | 'REGISTER';
 
@@ -12,8 +16,11 @@ interface AuthFormProps {
 const AuthForm: React.FC<AuthFormProps> = ({ handleClose }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [variant, setVariant] = useState<Variant>('LOGIN');
   const [isLoading, setIsLoading] = useState(false);
+  const { setHeaderMessage } = useHeaderMessageContext();
+  const { userId } = useUserIdContext();
 
   const toggleVariant = useCallback(() => {
     if (variant === 'LOGIN') setVariant('REGISTER');
@@ -28,20 +35,69 @@ const AuthForm: React.FC<AuthFormProps> = ({ handleClose }) => {
     setPassword(e.target.value);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleConfirmPasswordChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setConfirmPassword(e.target.value);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+
     if (variant === 'LOGIN') {
-      // login logic
+      try {
+        await api.users.loginWithEmail(email, password);
+      } catch (error) {
+        console.log(error);
+      }
       setIsLoading(false);
     }
     if (variant === 'REGISTER') {
-      // login logic
+      if (password !== confirmPassword) {
+        // Password and confirm password mismatch
+        setHeaderMessage('Passwords do not match!');
+        setTimeout(() => setHeaderMessage(''), 3000);
+        setIsLoading(false);
+        return;
+      }
+      try {
+        const user: User = {
+          id: userId,
+          email,
+          password,
+        };
+        const localConfigs = await api.configs.getLocalConfigs();
+        const localArchives = await api.archives.getLocalArchives();
+        const localData = {
+          configs: localConfigs,
+          archives: localArchives,
+        };
+        await api.users.signup(user, localData);
+      } catch (error) {
+        console.log(error);
+      }
       setIsLoading(false);
     }
   };
 
-  const socialAction = (action: string) => {};
+  const socialAction = async (action: string) => {
+    if (action === 'google') {
+      try {
+        // await api.users.loginWithGoogle();
+        window.location.href = 'http://localhost:3000/api/users/login/google';
+      } catch (error) {
+        console.log(error);
+      }
+    } else if (action === 'github') {
+      try {
+        // await api.users.loginWithGitHub();
+        window.location.href = 'http://localhost:3000/api/users/login/github';
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
 
   return ReactDOM.createPortal(
     <div className="fixed top-0 left-0 flex justify-center items-center w-full h-full bg-gray-800 bg-opacity-50">
@@ -92,8 +148,8 @@ const AuthForm: React.FC<AuthFormProps> = ({ handleClose }) => {
               <input
                 type="password"
                 id="password"
-                value={password}
-                onChange={handlePasswordChange}
+                value={confirmPassword}
+                onChange={handleConfirmPasswordChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded"
                 required
                 disabled={isLoading}

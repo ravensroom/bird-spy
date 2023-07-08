@@ -44,3 +44,12 @@ export const getArchives = async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 };
+
+const archivesController = {
+  getArchives,
+  rmArchive,
+  saveArchive,
+  getArchiveById,
+};
+
+export default archivesController;

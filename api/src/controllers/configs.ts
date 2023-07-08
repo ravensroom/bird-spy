@@ -44,3 +44,12 @@ export const getConfigs = async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 };
+
+const configsController = {
+  saveConfig,
+  getConfigs,
+  rmConfig,
+  getConfigById,
+};
+
+export default configsController;

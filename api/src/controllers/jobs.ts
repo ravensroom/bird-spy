@@ -48,3 +48,6 @@ export const isRunning = async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 };
+
+const jobsController = { addJobs, getJobs, rmJobs, isRunning };
+export default jobsController;
