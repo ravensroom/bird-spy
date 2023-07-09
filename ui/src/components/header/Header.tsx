@@ -1,12 +1,60 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useHeaderMessageContext } from '../../contexts/SaveMessageProvider';
 import { UserCircleIcon } from '@heroicons/react/24/outline';
 import LoginModal from './AuthForm';
+import api from '../../apis/api';
+import { useUserIdContext } from '../../contexts/UserIdProvider';
 
 const Header = () => {
   const { headerMessage } = useHeaderMessageContext();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const { userId } = useUserIdContext();
   // const [isBirdNinga, setIsBirdNinga] = useState(true);
+
+  useEffect(() => {
+    const checkAndHandleId = async () => {
+      const googleId = document.cookie
+        .split('; ')
+        .find((row) => row.startsWith('googleId'))
+        ?.split('=')[1];
+      const githubId = document.cookie
+        .split('; ')
+        .find((row) => row.startsWith('githubId'))
+        ?.split('=')[1];
+
+      if (googleId || githubId) {
+        try {
+          const newUser = googleId
+            ? {
+                id: userId,
+                googleId,
+              }
+            : {
+                id: userId,
+                githubId,
+              };
+          const archives = await api.archives.getLocalArchives();
+          const configs = await api.configs.getLocalConfigs();
+          const localData = { archives, configs };
+
+          const response = await api.users.newUserSocialLogin(
+            newUser,
+            localData
+          );
+
+          document.cookie =
+            'googleId=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+          document.cookie =
+            'githubId=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+        } catch (error) {
+          // Handle any API call errors
+        }
+      }
+    };
+
+    if (userId) checkAndHandleId();
+  }, [userId]);
+
   const handleClickHeader = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };

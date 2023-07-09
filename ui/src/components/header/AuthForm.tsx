@@ -9,6 +9,9 @@ import { User } from '../../types/types';
 
 type Variant = 'LOGIN' | 'REGISTER';
 
+const GOOGLE_AUTH_URL = 'http://localhost:3000/api/users/login/google';
+const GITHUB_AUTH_URL = 'http://localhost:3000/api/users/login/github';
+
 interface AuthFormProps {
   handleClose: () => void;
 }
@@ -78,24 +81,6 @@ const AuthForm: React.FC<AuthFormProps> = ({ handleClose }) => {
         console.log(error);
       }
       setIsLoading(false);
-    }
-  };
-
-  const socialAction = async (action: string) => {
-    if (action === 'google') {
-      try {
-        // await api.users.loginWithGoogle();
-        window.location.href = 'http://localhost:3000/api/users/login/google';
-      } catch (error) {
-        console.log(error);
-      }
-    } else if (action === 'github') {
-      try {
-        // await api.users.loginWithGitHub();
-        window.location.href = 'http://localhost:3000/api/users/login/github';
-      } catch (error) {
-        console.log(error);
-      }
     }
   };
 
@@ -182,14 +167,8 @@ const AuthForm: React.FC<AuthFormProps> = ({ handleClose }) => {
             </div>
           </div>
           <div className="mt-6 flex gap-2">
-            <AuthSocialButton
-              icon={BsGithub}
-              onClick={() => socialAction('github')}
-            />
-            <AuthSocialButton
-              icon={BsGoogle}
-              onClick={() => socialAction('google')}
-            />
+            <AuthSocialButton icon={BsGithub} href={GITHUB_AUTH_URL} />
+            <AuthSocialButton icon={BsGoogle} href={GOOGLE_AUTH_URL} />
           </div>
           <div className="flex gap-2 justify-center text-sm mt-6 px-2 text-gray-500">
             {variant === 'LOGIN'

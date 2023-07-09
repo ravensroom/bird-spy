@@ -11,5 +11,6 @@ router.get('/login/google', usersController.initiateGoogleLogin);
 router.get('/login/google/callback', usersController.handleGoogleCallback);
 router.get('/login/github', usersController.initiateGithubLogin);
 router.get('/login/github/callback', usersController.handleGithubCallback);
+router.post('/login/social/new', usersController.newUserSocialLogin);
 
 export default router;

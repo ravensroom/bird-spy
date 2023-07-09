@@ -59,7 +59,7 @@ passport.use(
         const user: User | null = await users.getUserByGoogleId(profile.id);
 
         if (!user) {
-          return done(null, profile.id);
+          return done(null, profile.id, { message: 'User googldId not found' });
         }
 
         // User authentication successful
@@ -90,7 +90,7 @@ passport.use(
         const user: User | null = await users.getUserByGithubId(profile.id);
 
         if (!user) {
-          return done(null, profile.id);
+          return done(null, profile.id, { message: 'User githubId not found' });
         }
 
         // User authentication successful

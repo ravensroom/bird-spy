@@ -18,7 +18,7 @@ const generateToken = (userId: string): string => {
   return jwt.sign(payload, env.JWT_SECRET, { expiresIn: '10 days' });
 };
 
-const sendSuccessAuthResponse = (res: Response, userId: string) => {
+const setJwtCookie = (res: Response, userId: string) => {
   const token = generateToken(userId);
 
   // Set the JWT as an HTTP-only cookie
@@ -27,9 +27,6 @@ const sendSuccessAuthResponse = (res: Response, userId: string) => {
     secure: true, // Enable if serving over HTTPS
     sameSite: 'strict',
   });
-
-  // Send the response back to the client
-  res.send({ message: 'Login successful', userId });
 };
 
 const signup = async (req: Request, res: Response, next: NextFunction) => {
@@ -64,7 +61,8 @@ const login = (req: Request, res: Response, next: NextFunction): void => {
       return res.status(401).json({ message: info.message });
     }
 
-    sendSuccessAuthResponse(res, user.id);
+    setJwtCookie(res, user.id);
+    res.send({ message: 'login success', userId: user.id });
   }
 };
 
@@ -74,7 +72,7 @@ const logout = (req: Request, res: Response) => {
     sameSite: 'strict',
   });
 
-  res.send({ message: 'Logout successful' });
+  res.send({ message: 'Logout success' });
 };
 
 const initiateGoogleLogin = passport.authenticate('google', {
@@ -92,24 +90,18 @@ const handleGoogleCallback = (
     next
   );
 
-  async function googleCallback(err: Error, user: User | string) {
+  async function googleCallback(err: Error, user: User | string, info: any) {
     if (err) {
       return next(err);
     }
 
     if (typeof user === 'string') {
-      // user is profile.id
-      try {
-        const { user: newUser, localData } = req.body;
-        newUser.googleId = user;
-        await users.saveUser(newUser, localData);
-        sendSuccessAuthResponse(res, newUser.id);
-      } catch (error) {
-        next(error);
-      }
+      res.cookie('googleId', user);
     } else {
-      sendSuccessAuthResponse(res, user.id);
+      setJwtCookie(res, user.id);
     }
+
+    res.redirect('http://localhost:5173');
   }
 };
 
@@ -128,24 +120,33 @@ const handleGithubCallback = (
     next
   );
 
-  async function githubCallback(err: Error, user: User | string) {
+  async function githubCallback(err: Error, user: User | string, info: any) {
     if (err) {
       return next(err);
     }
 
     if (typeof user === 'string') {
-      // user is profile.id
-      try {
-        const { user: newUser, localData } = req.body;
-        newUser.githubId = user;
-        await users.saveUser(newUser, localData);
-        sendSuccessAuthResponse(res, newUser.id);
-      } catch (error) {
-        next(error);
-      }
+      res.cookie('githubId', user);
     } else {
-      sendSuccessAuthResponse(res, user.id);
+      setJwtCookie(res, user.id);
     }
+
+    res.redirect('http://localhost:5173');
+  }
+};
+
+const newUserSocialLogin = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { user, localData } = req.body;
+    await users.saveUser(user, localData);
+    setJwtCookie(res, user.id);
+    res.send({ message: 'New User social login success', userId: user.id });
+  } catch (error) {
+    next(error);
   }
 };
 
@@ -157,6 +158,7 @@ const usersController = {
   handleGoogleCallback,
   initiateGithubLogin,
   handleGithubCallback,
+  newUserSocialLogin,
 };
 
 export default usersController;

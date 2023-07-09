@@ -191,7 +191,7 @@ const ConfigEditor: React.FC<ConfigEditorProps> = ({ config }) => {
         <AdjustmentsVerticalIcon />
       </Input>
       <Input
-        id="priority-keyword-input"
+        id="location-input"
         placeHolder={locationHolder}
         data={location.data}
         onAddItem={location.addItem}
@@ -201,7 +201,7 @@ const ConfigEditor: React.FC<ConfigEditorProps> = ({ config }) => {
         <MapPinIcon />
       </Input>
       <Input
-        id="priority-keyword-input"
+        id="timeRange-input"
         placeHolder={timeRangeHolder}
         data={timeRange.data}
         onAddItem={timeRange.addItem}
